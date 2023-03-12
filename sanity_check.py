@@ -252,8 +252,8 @@ actions = [(np.array([25]), np.array([55]), np.array([0.5]), 1),
            (np.array([35]), np.array([60]), np.array([0.7]), 1),
            (np.array([35]), np.array([55]), np.array([0.7]), 1),
            (np.array([31]), np.array([55]), np.array([0.8]), 1),
-           (np.array([31]), np.array([55]), np.array([0.8]), 1),
-           (np.array([31]), np.array([55]), np.array([0.8]), 1),]
+           (np.array([31]), np.array([55]), np.array([0.8]), 1)]
+           #(np.array([31]), np.array([55]), np.array([0.8]), 1),]
 
 # Para visualização:
 SPTq_list = []
@@ -378,8 +378,8 @@ ax[1, 2].set_xlabel("Tempo")
 ax[1, 2].set_ylabel("Custos")
 ax[1, 2].legend()
 
-ax[2, 0].plot(time_total, Sa, label="Sr", color="darkcyan", linestyle="solid")
-ax[2, 0].plot(time_total, Sr, label="Sa", color="lightblue", linestyle="solid")
+ax[2, 0].plot(time_total, Sa, label="Sr", color="skyblue", linestyle="solid")
+ax[2, 0].plot(time_total, Sr, label="Sa", color="darkcyan", linestyle="solid")
 # ax[2, 0].set_title("Frações da resistência elétrica (Sr) e do aquecimento do boiler (Sa)")
 ax[2, 0].set_xlabel("Tempo")
 ax[2, 0].set_ylabel("Fração")

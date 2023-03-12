@@ -35,3 +35,7 @@ Execute o seguinte comando:
 ```bash
 python main.py --logdir "C:\users\maria\ray_results\folder_experiment"
 ```
+
+## Check
+
+Resultado 
