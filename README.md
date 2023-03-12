@@ -32,8 +32,8 @@ Modelo com malha cascata para Ts com split-range, malha de inventário para o n�
 ### Episódios
 
 - Tempo de cada iteração: 2 minutos
-- Tempo total de cada episódio: 16 minutos
-- 8 ações em cada episódio
+- Tempo total de cada episódio: 14 minutos
+- 7 ações em cada episódio
 - 50 steps no PPO, totalizando 200000 episódios
 
 ### Parâmetros do PPO

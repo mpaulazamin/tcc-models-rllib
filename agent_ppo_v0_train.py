@@ -172,19 +172,15 @@ class ShowerEnv(gym.Env):
 
         # Valor final da temperatura do boiler:
         self.Tq = self.YY[:,0][-1]
-        self.Tq_total = self.YY[:,0]
 
         # Valor final do nível do tanque:
         self.h = self.YY[:,1][-1]
-        self.h_total = self.YY[:,1]
 
         # Valor final da temperatura do tanque:
         self.Tt = self.YY[:,2][-1]
-        self.Tt_total = self.YY[:,2]
 
         # Valor final da temperatura de saída:
         self.Ts = self.YY[:,3][-1]
-        self.Ts_total = self.YY[:,3]
 
         # Fração do aquecedor do boiler utilizada durante a iteração:
         self.Sa_total =  self.UU[:,0]
@@ -194,11 +190,9 @@ class ShowerEnv(gym.Env):
 
         # Valor final da abertura de corrente fria:
         self.xf = self.UU[:,1][-1]
-        self.xf_total = self.UU[:,1]
 
         # Valor final da abertura de corrente quente:
         self.xq = self.UU[:,2][-1]
-        self.xq_total = self.UU[:,2]
 
         # Valor final da abertura da válvula de saída:
         self.xs = self.UU[:,3][-1]
