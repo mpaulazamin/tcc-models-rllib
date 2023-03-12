@@ -32,6 +32,8 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 
 - Tempo de cada iteração: 2 minutos
 - Tempo total de cada episódio: 14 minutos
+- 7 ações em cada episódio
+- 50 steps no PPO, totalizando 200000 episódios
 
 ### Parâmetros do PPO
 
