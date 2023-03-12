@@ -362,7 +362,7 @@ ax[1, 0].set_xlabel("Tempo")
 ax[1, 0].set_ylabel("Nível")
 ax[1, 0].legend()
 
-ax[1, 1].plot(time_total, xq, label="xq", color="darkmagenta", linestyle="dashed")
+ax[1, 1].plot(time_total, xq, label="xq", color="darkmagenta", linestyle="solid")
 ax[1, 1].plot(time_total, xf, label="xf", color="deeppink", linestyle="solid")
 ax[1, 1].plot(time_total, xs, label="xs", color="palevioletred", linestyle="solid")
 # ax[1, 1].set_title("Aberturas das válvulas quente (xq), fria (xf) e de saída (xs)")
