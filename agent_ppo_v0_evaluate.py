@@ -233,7 +233,7 @@ class ShowerEnv(gym.Env):
         if self.tempo_final == 14 or self.h > 100: 
             done = True
 
-        info = {}
+        info = {"xq": self.xq_total}
 
         return self.obs, reward, done, info
     
@@ -263,7 +263,7 @@ for i in range(0, 1):
     episode_reward = 0
     print(f"Episódio {i}.")
 
-    for i in range(0, 6):
+    for i in range(0, 7):
 
         # Seleciona ações:
         action = agent.compute_single_action(obs)
@@ -273,6 +273,7 @@ for i in range(0, 1):
         # Retorna os estados e a recompensa:
         obs, reward, done, info = env.step(action)
         print(f"Estados: {obs}")
+        print(info.get("xq"))
 
         # Recompensa total:
         episode_reward += reward
