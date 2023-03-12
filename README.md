@@ -8,7 +8,7 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 
 - xq: 0.01 a 0.99 - contínuo
 - SPTq: 30 a 70 - contínuo
-- xs: 0.01 a 0.99 - contínuo
+- xs: 0.3 a 0.7 - contínuo
 - Sr: 0 a 1 - contínuo
 
 ### Espaço de estados
