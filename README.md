@@ -1,37 +1,55 @@
-## Instalação
+## Agent PPO - V1
 
-Siga estas instruções: https://github.com/ray-project/ray/tree/master/rllib#installation-and-setup.
+Modelo com malha cascata para Ts com split-range, malha de inventário para o nível do tanque, e controle liga-desliga no boiler.
 
-Depois, instale o pacote `tensorflow_probability`: https://github.com/tensorflow/probability/releases.
+![chuveiro](https://github.com/mpaulazamin/tcc-rllib/blob/agent_ppo_v1/imagens/chuveiro_controle_t4a.jpg)
+
+### Espaço de ações
+
+- SPTs: 30 a 45 - contínuo
+- SPTq: 30 a 70 - contínuo
+- xs: 0.01 a 0.99 - contínuo
+- split_range: 0 (desligado) e 1 (ligado)
+
+### Espaço de estados
+
+- Ts: 0 a 100
+- Tq: 0 a 100
+- Tt: 0 a 100
+- h: 0 a 10000
+- Fs: 0 a 100
+- xq: 0 a 1
+- xf: 0 a 1
+- iqb: 0 a 1
+
+### Variáveis fixas
+
+- Fd: 0
+- Td: 25
+- Tf: 25
+- Tinf: 25
+
+### Episódios
+
+- Tempo de cada iteração: 2 minutos
+- Tempo total de cada episódio: 14 minutos
+
+### Parâmetros do PPO
+
+- Parâmetros default
+
+### Recompensa
+
+Definida como:
 
 ```bash
-pip install tensorflow-probability==0.19.0
+recompensa = iqb
 ```
 
-## Integração com Tensorboard
+### Resultados
 
-Siga estas instruções: https://stackoverflow.com/questions/45095820/tensorboard-command-not-found.
 
-Execute o seguinte comando:
 
-```bash
-pip show tensorflow
-```
+### Próximos passos
 
-Entre no local onde o `tensorflow` está instalado:
 
-```bash
-cd C:\users\maria\appdata\roaming\python\python38\site-packages
-```
-
-Entre no folder do `tensorboard`:
-
-```bash
-cd tensorboard
-```
-
-Execute o seguinte comando:
-
-```bash
-python main.py --logdir "C:\users\maria\ray_results\folder_experiment"
-```
