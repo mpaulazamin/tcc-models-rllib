@@ -274,7 +274,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1\\checkpoint_000050"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1\\checkpoint_000035"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
@@ -305,7 +305,7 @@ Td_list = []
 Tf_list = []
 Tinf_list = []
 time_total = np.arange(start=0, stop=14 + 0.07, step=0.01, dtype="float")
-time_actions = np.arange(start=0, stop=14, step=2, dtype="int")
+time_actions = np.arange(start=1, stop=8, step=1, dtype="int")
 
 # Roda episódios com ações sugeridas pelo agente treinado:
 for i in range(0, 1):
@@ -313,7 +313,7 @@ for i in range(0, 1):
     episode_reward = 0
     print(f"Episódio {i}.")
 
-    for i in range(0, 6):
+    for i in range(0, 7):
 
         # Seleciona ações:
         action = agent.compute_single_action(obs)
@@ -359,7 +359,6 @@ Tq = np.concatenate(Tq_list, axis=0)
 SPh = np.concatenate(SPh_list, axis=0)
 h = np.concatenate(h_list, axis=0)
 Tt = np.concatenate(Tt_list, axis=0)
-SPTs = np.concatenate(SPTs_list, axis=0)
 Ts = np.concatenate(Ts_list, axis=0)
 Sr = np.concatenate(Sr_list, axis=0)
 Sa = np.concatenate(Sa_list, axis=0)
@@ -392,7 +391,7 @@ ax[0, 1].legend()
 
 ax[0, 2].plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
 # ax[0, 2].set_title("Qualidade do banho (IQB)")
-ax[0, 2].set_xlabel("Tempo")
+ax[0, 2].set_xlabel("Ações")
 ax[0, 2].set_ylabel("Índice final")
 ax[0, 2].legend()
 
@@ -403,7 +402,7 @@ ax[1, 0].set_xlabel("Tempo")
 ax[1, 0].set_ylabel("Nível")
 ax[1, 0].legend()
 
-ax[1, 1].plot(time_total, xq, label="xq", color="darkmagenta", linestyle="dashed")
+ax[1, 1].plot(time_total, xq, label="xq", color="darkmagenta", linestyle="solid")
 ax[1, 1].plot(time_total, xf, label="xf", color="deeppink", linestyle="solid")
 ax[1, 1].plot(time_total, xs, label="xs", color="palevioletred", linestyle="solid")
 # ax[1, 1].set_title("Aberturas das válvulas quente (xq), fria (xf) e de saída (xs)")
@@ -415,12 +414,12 @@ ax[1, 2].plot(time_actions, custo_eletrico_list, label="Custo elétrico", color=
 ax[1, 2].plot(time_actions, custo_gas_list, label="Custo do gás", color="gray", linestyle="solid")
 ax[1, 2].plot(time_actions, custo_agua_list, label="Custo da água", color="dodgerblue", linestyle="solid")
 # ax[1, 2].set_title("Custos do banho")
-ax[1, 2].set_xlabel("Tempo")
+ax[1, 2].set_xlabel("Ações")
 ax[1, 2].set_ylabel("Custos")
 ax[1, 2].legend()
 
-ax[2, 0].plot(time_total, Sa, label="Sr", color="darkcyan", linestyle="solid")
-ax[2, 0].plot(time_total, Sr, label="Sa", color="lightblue", linestyle="solid")
+ax[2, 0].plot(time_total, Sa, label="Sa", color="skyblue", linestyle="solid")
+ax[2, 0].plot(time_total, Sr, label="Sr", color="darkcyan", linestyle="solid")
 # ax[2, 0].set_title("Frações da resistência elétrica (Sr) e do aquecimento do boiler (Sa)")
 ax[2, 0].set_xlabel("Tempo")
 ax[2, 0].set_ylabel("Fração")
