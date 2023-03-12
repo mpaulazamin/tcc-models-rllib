@@ -142,7 +142,7 @@ class ShowerEnv(gym.Env):
         self.SPTs = round(action[0][0], 1)
 
         # Setpoint da temperatura do boiler:
-        self.SPTq = action[1]
+        self.SPTq = round(action[1][0], 1)
 
         # Abertura da válvula de saída:
         self.xs = round(action[2][0], 2)
