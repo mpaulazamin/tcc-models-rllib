@@ -390,7 +390,7 @@ def calculo_iqb(Ts, Fs):
     return iqb
 
 
-def custo_eletrico_banho(Sr, potencia_eletrica, custo_eletrico_kwh, tempo, dt):
+def custo_eletrico_banho(Sr, potencia_eletrica, custo_eletrico_kwh, dt):
     """Calcula o custo da parte elétrica do banho.
 
     O custo da parte elétrica do banho é dado pela potência do chuveiro em KW multiplicado pela fração de utilização
@@ -402,19 +402,18 @@ def custo_eletrico_banho(Sr, potencia_eletrica, custo_eletrico_kwh, tempo, dt):
         Sr (float): Seletor da resistência elétrica do tanque de aquecimento.
         potencial_eletrica (float): Potência elétrica do tanque de aquecimento (chuveiro) em kW.
         custo_eletrico_kwh (float): Custo do kWh da energia em reais por hora.
-        tempo (float): Tempo da ação em minutos.
         dt (float): Passo de tempo.
 
     Retorna:
         custo_eletrico_total (float): Custo da energia elétrica do banho em reais.
     """
     Sr_utilizado = np.trapz(y=Sr, dx=dt)
-    custo_eletrico_total = potencia_eletrica * Sr_utilizado * custo_eletrico_kwh * tempo / 60
+    custo_eletrico_total = potencia_eletrica * Sr_utilizado * custo_eletrico_kwh / 60
 
     return custo_eletrico_total
 
 
-def custo_gas_banho(Sa, potencia_aquecedor, custo_gas_kg, tempo, dt):
+def custo_gas_banho(Sa, potencia_aquecedor, custo_gas_kg, dt):
     """Calcula o custo do gás do banho.
 
     Para calcular o custo do gás do banho, primeiro é necessário achar por quanto tempo o aquecedor a gás ficou ligado.
@@ -440,7 +439,6 @@ def custo_gas_banho(Sa, potencia_aquecedor, custo_gas_kg, tempo, dt):
         Sa (float): Seletor do aquecimento do boiler.
         potencial_aquecedor (float): Potência do aquecedor (boiler) em kcal/h.
         custo_gas_kg (float): Custo do kg do gás em reais por kg.
-        tempo (float): Tempo da ação em minutos.
         dt (float): Passo de tempo.
 
     Retorna:
@@ -459,7 +457,7 @@ def custo_gas_banho(Sa, potencia_aquecedor, custo_gas_kg, tempo, dt):
 
     # Quantidade de kcal fornecida durante o banho:
     # kcal_fornecida_no_banho = potencia_util * tempo_aquecedor_ligado / 60
-    kcal_fornecida_no_banho = potencia_util * Sa_utilizado * tempo / 60
+    kcal_fornecida_no_banho = potencia_util * Sa_utilizado / 60
 
     # Poder calorífico do gás em kcal/kg:
     kg_equivalente_kcal = 11750 

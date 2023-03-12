@@ -210,10 +210,10 @@ class ShowerEnv(gym.Env):
         self.iqb = calculo_iqb(self.Ts, self.Fs)
 
         # Cálculo do custo elétrico do banho:
-        self.custo_eletrico = custo_eletrico_banho(self.Sr_total, self.potencia_eletrica, self.custo_eletrico_kwh, self.tempo_iteracao, self.dt)
+        self.custo_eletrico = custo_eletrico_banho(self.Sr_total, self.potencia_eletrica, self.custo_eletrico_kwh, self.dt)
 
         # Cálculo do custo de gás do banho:
-        self.custo_gas = custo_gas_banho(self.Sa_total, self.potencia_aquecedor, self.custo_gas_kg, self.tempo_iteracao, self.dt)
+        self.custo_gas = custo_gas_banho(self.Sa_total, self.potencia_aquecedor, self.custo_gas_kg, self.dt)
 
         # Cálculo do custo da água:
         self.custo_agua = custo_agua(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
