@@ -203,7 +203,12 @@ class ShowerEnv():
         if self.tempo_final == 14 or self.h > 100: 
             done = True
 
-        info = {}
+        info = {"Ts": self.Ts_total,
+                "h": self.h_total,
+                "Sa": self.Sa_total,
+                "Sr": self.Sr_total,
+                "xq": self.xq_total,
+                "xf": self.xf_total}
 
         return self.obs, reward, done, info
     
@@ -222,9 +227,47 @@ actions = [(np.array([25]), np.array([55]), np.array([0.5]), 1),
            (np.array([31]), np.array([55]), np.array([0.8]), 1),
            (np.array([31]), np.array([55]), np.array([0.8]), 1),]
 
+Ts_list = []
+h_list = []
+Sa_list = []
+Sr_list = []
+xq_list = []
+xf_list = []
+time = np.arange(start=0, stop=16 + 0.09, step=0.01, dtype="float")
+
 obs = env.reset()
 for action in actions:
     print(action)
     obs, reward, done, info = env.step(action)
+    Ts_list.append(info.get("Ts"))
+    h_list.append(info.get("h"))
+    Sa_list.append(info.get("Sa"))
+    Sr_list.append(info.get("Sr"))
+    xq_list.append(info.get("xq"))
+    xf_list.append(info.get("xf"))
     print(obs)
     print("")
+
+Ts = np.concatenate(Ts_list, axis=0)
+h = np.concatenate(h_list, axis=0)
+Sa = np.concatenate(Sa_list, axis=0)
+Sr = np.concatenate(Sr_list, axis=0)
+xq = np.concatenate(xq_list, axis=0)
+xf = np.concatenate(xf_list, axis=0)
+
+plt.figure(figsize=(15, 10))
+plt.subplot(2,2,1)
+plt.plot(time, Ts, label="Ts")
+plt.legend()
+plt.subplot(2,2,2)
+plt.plot(time, h, label="h")
+plt.legend()
+plt.subplot(2,2,3)
+plt.plot(time, Sa, label="Sa")
+plt.plot(time, Sr, label="Sr")
+plt.legend()
+plt.subplot(2,2,4)
+plt.plot(time, xq, label="xq")
+plt.plot(time, xf, label="xf")
+plt.legend()
+plt.show()
