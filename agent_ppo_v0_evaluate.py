@@ -282,7 +282,7 @@ agent.restore(checkpoint_root)
 env = ShowerEnv()
 obs = env.reset()
 
-# Para visualização
+# Para visualização:
 SPTq_list = []
 Tq_list = []
 SPh_list = []
@@ -305,7 +305,7 @@ Td_list = []
 Tf_list = []
 Tinf_list = []
 time_total = np.arange(start=0, stop=14 + 0.07, step=0.01, dtype="float")
-time_actions = np.arange(start=0, stop=14, step=2, dtype="int")
+time_actions = np.arange(start=1, stop=8, step=1, dtype="int")
 
 # Roda episódios com ações sugeridas pelo agente treinado:
 for i in range(0, 1):
@@ -396,7 +396,7 @@ ax[0, 1].legend()
 
 ax[0, 2].plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
 # ax[0, 2].set_title("Qualidade do banho (IQB)")
-ax[0, 2].set_xlabel("Tempo")
+ax[0, 2].set_xlabel("Ações")
 ax[0, 2].set_ylabel("Índice final")
 ax[0, 2].legend()
 
@@ -407,7 +407,7 @@ ax[1, 0].set_xlabel("Tempo")
 ax[1, 0].set_ylabel("Nível")
 ax[1, 0].legend()
 
-ax[1, 1].plot(time_total, xq, label="xq", color="darkmagenta", linestyle="dashed")
+ax[1, 1].plot(time_total, xq, label="xq", color="darkmagenta", linestyle="solid")
 ax[1, 1].plot(time_total, xf, label="xf", color="deeppink", linestyle="solid")
 ax[1, 1].plot(time_total, xs, label="xs", color="palevioletred", linestyle="solid")
 # ax[1, 1].set_title("Aberturas das válvulas quente (xq), fria (xf) e de saída (xs)")
@@ -419,12 +419,12 @@ ax[1, 2].plot(time_actions, custo_eletrico_list, label="Custo elétrico", color=
 ax[1, 2].plot(time_actions, custo_gas_list, label="Custo do gás", color="gray", linestyle="solid")
 ax[1, 2].plot(time_actions, custo_agua_list, label="Custo da água", color="dodgerblue", linestyle="solid")
 # ax[1, 2].set_title("Custos do banho")
-ax[1, 2].set_xlabel("Tempo")
+ax[1, 2].set_xlabel("Ações")
 ax[1, 2].set_ylabel("Custos")
 ax[1, 2].legend()
 
-ax[2, 0].plot(time_total, Sa, label="Sr", color="darkcyan", linestyle="solid")
-ax[2, 0].plot(time_total, Sr, label="Sa", color="lightblue", linestyle="solid")
+ax[2, 0].plot(time_total, Sa, label="Sa", color="skyblue", linestyle="solid")
+ax[2, 0].plot(time_total, Sr, label="Sr", color="darkcyan", linestyle="solid")
 # ax[2, 0].set_title("Frações da resistência elétrica (Sr) e do aquecimento do boiler (Sa)")
 ax[2, 0].set_xlabel("Tempo")
 ax[2, 0].set_ylabel("Fração")
