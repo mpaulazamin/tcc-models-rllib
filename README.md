@@ -36,6 +36,9 @@ Execute o seguinte comando:
 python main.py --logdir "C:\users\maria\ray_results\folder_experiment"
 ```
 
-## Check
+## Sanity check
 
-Resultado 
+Treinando o sistema com o ambiente customizado [neste script](https://github.com/mpaulazamin/tcc-models-rllib/blob/main/sanity_check.py), obtém-se o resultado abaixo, 
+que reproduz o resultado encontrado no [notebook](https://github.com/mpaulazamin/tcc-models-rllib/blob/main/chuveiro_turbinado.ipynb) do professor.
+
+![check](https://github.com/mpaulazamin/tcc-models-rllib/blob/main/imagens/custom_env.jpg)
