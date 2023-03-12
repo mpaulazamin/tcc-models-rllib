@@ -55,7 +55,7 @@ class ShowerEnv(gym.Env):
         # Ações - SPTs, SPTq, xs, split-range:
         self.action_space = gym.spaces.Tuple(
             (
-                gym.spaces.Box(low=30, high=45, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0.3, high=0.6, shape=(1,), dtype=np.float32),
                 gym.spaces.Discrete(2, start=0)
@@ -275,7 +275,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v0\\checkpoint_000050"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v3\\checkpoint_000050"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:

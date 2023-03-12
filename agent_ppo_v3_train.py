@@ -60,7 +60,7 @@ class ShowerEnv(gym.Env):
         # Ações - SPTs, SPTq, xs, split-range:
         self.action_space = gym.spaces.Tuple(
             (
-                gym.spaces.Box(low=30, high=45, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
                 gym.spaces.Discrete(2, start=0)
@@ -236,7 +236,7 @@ class ShowerEnv(gym.Env):
 
 
 # Folder para checkpoints:
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v0"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v3"
 shutil.rmtree(checkpoint_root, ignore_errors=True, onerror=None)
 
 # Folder para os resultados:
@@ -288,7 +288,7 @@ for n in range(1, n_iter):
 # Salva resultados e plota dados do episódio:
 print(results)
 df = pd.DataFrame(data=episode_data)
-df.to_csv("episode_data_agent_ppo_v0.csv")
+df.to_csv("episode_data_agent_ppo_v3.csv")
 
 policy = agent.get_policy()
 model = policy.model
