@@ -294,7 +294,7 @@ for n in range(1, n_iter):
 # Salva resultados e plota dados do episódio:
 print(results)
 df = pd.DataFrame(data=episode_data)
-df.to_csv("episode_data_agent_ppo_v1.csv")
+df.to_csv("episode_data_agent_ppo_v0.csv")
 
 policy = agent.get_policy()
 model = policy.model
