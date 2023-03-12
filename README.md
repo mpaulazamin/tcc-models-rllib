@@ -48,8 +48,8 @@ recompensa = iqb
 
 ### Resultados
 
-
+TBD
 
 ### Próximos passos
 
-
+TBD
