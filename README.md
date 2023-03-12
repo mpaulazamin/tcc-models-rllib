@@ -1,4 +1,4 @@
-## Agent PPO - V3
+## Agent PPO - V1
 
 Modelo com malha de inventário para o nível do tanque e com controle liga-desliga do boiler. Sem malha cascata, sem split-range.
 
