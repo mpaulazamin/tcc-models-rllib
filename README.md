@@ -1,15 +1,13 @@
-## Agent PPO - V1
+## Agent PPO - V3
 
-Modelo com malha cascata para Ts com split-range, malha de inventário para o nível do tanque, e controle liga-desliga no boiler.
-
-![chuveiro](https://github.com/mpaulazamin/tcc-rllib/blob/agent_ppo_v1/imagens/chuveiro_controle_t4a.jpg)
+Modelo com malha de inventário para o nível do tanque e com controle liga-desliga do boiler. Sem malha cascata, sem split-range.
 
 ### Espaço de ações
 
-- SPTs: 30 a 45 - contínuo
+- xq: 0.01 a 0.99 - contínuo
 - SPTq: 30 a 70 - contínuo
 - xs: 0.01 a 0.99 - contínuo
-- split_range: 0 (desligado) e 1 (ligado)
+- Sr: 0 a 1 - contínuo
 
 ### Espaço de estados
 
@@ -18,7 +16,6 @@ Modelo com malha cascata para Ts com split-range, malha de inventário para o n�
 - Tt: 0 a 100
 - h: 0 a 10000
 - Fs: 0 a 100
-- xq: 0 a 1
 - xf: 0 a 1
 - iqb: 0 a 1
 
@@ -48,8 +45,8 @@ recompensa = iqb
 
 ### Resultados
 
-
+TBQ
 
 ### Próximos passos
 
-
+TBD

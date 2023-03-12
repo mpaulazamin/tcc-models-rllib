@@ -43,6 +43,9 @@ class ShowerEnv(gym.Env):
         self.Tf = 25
         self.Tinf = 25
 
+        # Não utiliza split-range:
+        self.split_range = 0
+
         # Potência da resistência elétrica em kW:
         self.potencia_eletrica = 5.5
 
@@ -54,23 +57,20 @@ class ShowerEnv(gym.Env):
         self.custo_gas_kg = 1
         self.custo_agua_m3 = 3
 
-        # Fração da resistência elétrica:
-        self.Sr = 0
-
-        # Ações - SPTs, SPTq, xs, split-range:
+        # Ações - xq, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
             (
-                gym.spaces.Box(low=30, high=45, shape=(1,), dtype=np.float32),
-                gym.spaces.Discrete(40, start=30),
-                gym.spaces.Box(low=0.3, high=0.6, shape=(1,), dtype=np.float32),
-                gym.spaces.Discrete(2, start=0)
+                gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             ),
         )
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb:
+        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1]),
             dtype=np.float32, 
         )
 
@@ -127,8 +127,8 @@ class ShowerEnv(gym.Env):
         self.I_buffer = self.Kp * self.Y0[id] * (1 - self.b)
         self.D_buffer = np.array([0, 0, 0, 0])  
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb],
+        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb],
                              dtype=np.float32)
         
         return self.obs
@@ -138,23 +138,23 @@ class ShowerEnv(gym.Env):
         # Tempo de cada iteração:
         self.tempo_final = self.tempo_inicial + self.tempo_iteracao
 
-        # Setpoint da temperatura de saída:
-        self.SPTs = round(action[0][0], 1)
+        # Abertura da válvula quente:
+        self.xq = round(action[0][0], 2)
 
-        # Setpoint da temperatura do boiler:
-        self.SPTq = action[1]
+        # Fração de aquecimento do boiler:
+        self.SPTq = round(action[1][0], 1)
 
         # Abertura da válvula de saída:
         self.xs = round(action[2][0], 2)
 
-        # Split-range:
-        self.split_range = action[3]
+        # Fração da resistência elétrica
+        self.Sr = round(action[3][0], 2)
 
-        # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr
+        # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
             [   
-                [self.tempo_inicial, self.SPTq, self.SPh, self.SPTs, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
-                [self.tempo_final, self.SPTq, self.SPh, self.SPTs, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr]
+                [self.tempo_inicial, self.SPTq, self.SPh, self.xq, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
+                [self.tempo_final, self.SPTq, self.SPh, self.xq, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr]
             ]
         )
 
@@ -190,7 +190,7 @@ class ShowerEnv(gym.Env):
         self.Sa_total =  self.UU[:,0]
 
         # Fração da resistência elétrica utilizada durante a iteração:
-        self.Sr_total = self.UU[:,8]
+        self.Sr = self.UU[:,8][-1]
 
         # Valor final da abertura de corrente fria:
         self.xf = self.UU[:,1][-1]
@@ -210,16 +210,16 @@ class ShowerEnv(gym.Env):
         self.iqb = calculo_iqb(self.Ts, self.Fs)
 
         # Cálculo do custo elétrico do banho:
-        self.custo_eletrico = custo_eletrico_banho(self.Sr_total, self.potencia_eletrica, self.custo_eletrico_kwh, self.tempo_iteracao, self.dt)
+        self.custo_eletrico = custo_eletrico_banho(self.Sr, self.potencia_eletrica, self.custo_eletrico_kwh, self.tempo_iteracao)
 
         # Cálculo do custo de gás do banho:
-        self.custo_gas = custo_gas_banho(self.Sa_total, self.potencia_aquecedor, self.custo_gas_kg, self.tempo_iteracao, self.dt)
+        self.custo_gas = custo_gas_banho(self.Sa_total, self.potencia_aquecedor, self.custo_gas_kg, self.dt)
 
         # Cálculo do custo da água:
         self.custo_agua = custo_agua(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb],
+        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb],
                              dtype=np.float32)
 
         # Define a recompensa:
@@ -241,45 +241,66 @@ class ShowerEnv(gym.Env):
         pass
 
 
-# Inicia o Ray:
+# Folder para checkpoints:
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1"
+shutil.rmtree(checkpoint_root, ignore_errors=True, onerror=None)
+
+# Folder para os resultados:
+ray_results = f"C:\\Users\zamin\\ray_results"
+shutil.rmtree(ray_results, ignore_errors=True, onerror=None)
+
+# Inicializa o Ray:
 ray.shutdown()
 info = ray.init(ignore_reinit_error=True)
 
-# Carrega o agente salvo:
+# Define as configurações para o algoritmo PPO:
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
+
+# Constrói o agente:
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v0\\checkpoint_000081"
-agent.restore(checkpoint_root)
 
-# Constrói o ambiente:
-env = ShowerEnv()
-done = False
-obs = env.reset()
+# Armazena resultados:
+results = []
+episode_data = []
 
-# Roda episódios com ações sugeridas pelo agente treinado:
-for i in range(0, 1):
+# Realiza o treinamento:
+n_iter = 51
+for n in range(1, n_iter):
 
-    episode_reward = 0
-    print(f"Episódio {i}.")
+    # Treina o agente:
+    result = agent.train()
+    results.append(result)
+    
+    # Armazena dados do episódio:
+    episode = {
+        "n": n,
+        "episode_reward_min": result["episode_reward_min"],
+        "episode_reward_mean": result["episode_reward_mean"], 
+        "episode_reward_max": result["episode_reward_max"],  
+        "episode_len_mean": result["episode_len_mean"],
+    }
 
-    for i in range(0, 6):
+    episode_data.append(episode)
 
-        # Seleciona ações:
-        action = agent.compute_single_action(obs)
-        print(f"Iteração: {i}")
-        print(f"Ações: {action}")
+    # Salva checkpoint a cada 5 iterações:
+    if n % 5 == 0:
+        file_name = agent.save(checkpoint_root)
+        print(f'{n:3d}: Min/Mean/Max reward: {result["episode_reward_min"]:8.4f}/{result["episode_reward_mean"]:8.4f}/{result["episode_reward_max"]:8.4f}. Checkpoint saved to {file_name}.')
+    else:
+        print(f'{n:3d}: Min/Mean/Max reward: {result["episode_reward_min"]:8.4f}/{result["episode_reward_mean"]:8.4f}/{result["episode_reward_max"]:8.4f}.')
 
-        # Retorna os estados e a recompensa:
-        obs, reward, done, info = env.step(action)
-        print(f"Estados: {obs}")
 
-        # Recompensa total:
-        episode_reward += reward
-        print(f"Recompensa: {reward}.")
+# Salva resultados e plota dados do episódio:
+print(results)
+df = pd.DataFrame(data=episode_data)
+df.to_csv("episode_data_agent_ppo_v1.csv")
 
-    print(f"Recompensa total: {episode_reward}")
-    print("")
+policy = agent.get_policy()
+model = policy.model
+pprint.pprint(model.variables())
+pprint.pprint(model.value_function())
+print(model.base_model.summary())
 
 # Reseta o Ray:
 ray.shutdown()
