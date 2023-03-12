@@ -1,4 +1,4 @@
-## Agent PPO - V1
+## Agent PPO - V0
 
 Modelo com malha cascata para Ts com split-range, malha de inventário para o nível do tanque, e controle liga-desliga no boiler.
 
@@ -33,6 +33,7 @@ Modelo com malha cascata para Ts com split-range, malha de inventário para o n�
 
 - Tempo de cada iteração: 2 minutos
 - Tempo total de cada episódio: 14 minutos
+- 50 steps no PPO, totalizando 200000 episódios
 
 ### Parâmetros do PPO
 
