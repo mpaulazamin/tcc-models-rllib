@@ -47,7 +47,7 @@ Definida como:
 recompensa = iqb / (iqb + custos)
 ```
 
-onde _custos_ é a soma de todos os custos (elétrico, gás, água)
+onde _custos_ é a soma de todos os custos (elétrico, gás, água).
 
 ### Resultados
 
