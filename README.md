@@ -50,8 +50,16 @@ recompensa = iqb
 
 ### Resultados
 
-TBD
+O agente continua conseguindo atingir IQBs próximos a 1 depois dos primeiros 2 minutos (primeira ação). Esse atraso ainda ocorre por causa do tempo morto. Outro ponto para melhorar é que talvez Tq deva iniciar em 70, pois o agente geralmente seleciona temperaturas altas para o primeiro SPTq, mas como a válvula de corrente quente fica totalmente aberta, o sistema não consegue alcançar Tq acima de 55 graus. 
+
+Além disso, às vezes, o agente ainda seleciona o valor 1 para o split-range (ligado), mas xq não ultrapassa o valor 1, então não é utilizado o split-range. Isso parece não atrapalhar muito o agente, mas talvez seja outro ponto para melhorar.
+
+Se começarmos Tq em 70 graus, talvez nem seja necessário otimizar os custos nesse caso, porque o agente usa o split-range majoritariamente no começo do episódio. 
+
+A figura abaixo ilustra um exemplo de 1 episódio completo com o último checkpoint do agente (step 50):
+
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v3/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v3.jpg)
 
 ### Próximos passos
 
-TBD
+Tentar incluir os custos no sistema, mas não acho que fará muita diferença.

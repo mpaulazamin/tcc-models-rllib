@@ -377,33 +377,33 @@ Tinf = np.concatenate(Tinf_list, axis=0)
 
 # Gráficos:
 sns.set_style("darkgrid")
-fig, ax = plt.subplots(3, 3, figsize=(20, 17))
+fig, ax = plt.subplots(3, 3, figsize=(20, 18))
 
 ax[0, 0].plot(time_total, SPTs, label="SPTs", color="navy", linestyle="dashed")
 ax[0, 0].plot(time_total, Ts, label="Ts", color="royalblue", linestyle="solid")
 ax[0, 0].plot(time_total, Tt, label="Tt", color="deepskyblue", linestyle="solid")
 # ax[0, 0].set_title("Temperaturas de saída (Ts) e do tanque (Tt)")
-ax[0, 0].set_xlabel("Tempo")
+# ax[0, 0].set_xlabel("Tempo")
 ax[0, 0].set_ylabel("Temperatura")
 ax[0, 0].legend()
 
 ax[0, 1].plot(time_total, SPTq, label="SPTq", color="purple", linestyle="dashed")
 ax[0, 1].plot(time_total, Tq, label="Tq", color="mediumorchid", linestyle="solid")
 # ax[0, 1].set_title("Temperatura do boiler (Tq)")
-ax[0, 1].set_xlabel("Tempo")
+# ax[0, 1].set_xlabel("Tempo")
 ax[0, 1].set_ylabel("Temperatura")
 ax[0, 1].legend()
 
 ax[0, 2].plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
 # ax[0, 2].set_title("Qualidade do banho (IQB)")
-ax[0, 2].set_xlabel("Ações")
+# ax[0, 2].set_xlabel("Ações")
 ax[0, 2].set_ylabel("Índice final")
 ax[0, 2].legend()
 
 ax[1, 0].plot(time_total, SPh, label="SPh", color="darkslategray", linestyle="dashed")
 ax[1, 0].plot(time_total, h, label="h", color="teal", linestyle="solid")
 # ax[1, 0].set_title("Nível do tanque (h)")
-ax[1, 0].set_xlabel("Tempo")
+# ax[1, 0].set_xlabel("Tempo")
 ax[1, 0].set_ylabel("Nível")
 ax[1, 0].legend()
 
@@ -411,7 +411,7 @@ ax[1, 1].plot(time_total, xq, label="xq", color="darkmagenta", linestyle="solid"
 ax[1, 1].plot(time_total, xf, label="xf", color="deeppink", linestyle="solid")
 ax[1, 1].plot(time_total, xs, label="xs", color="palevioletred", linestyle="solid")
 # ax[1, 1].set_title("Aberturas das válvulas quente (xq), fria (xf) e de saída (xs)")
-ax[1, 1].set_xlabel("Tempo")
+# ax[1, 1].set_xlabel("Tempo")
 ax[1, 1].set_ylabel("Abertura")
 ax[1, 1].legend()
 
@@ -419,7 +419,7 @@ ax[1, 2].plot(time_actions, custo_eletrico_list, label="Custo elétrico", color=
 ax[1, 2].plot(time_actions, custo_gas_list, label="Custo do gás", color="gray", linestyle="solid")
 ax[1, 2].plot(time_actions, custo_agua_list, label="Custo da água", color="dodgerblue", linestyle="solid")
 # ax[1, 2].set_title("Custos do banho")
-ax[1, 2].set_xlabel("Ações")
+# ax[1, 2].set_xlabel("Ações")
 ax[1, 2].set_ylabel("Custos")
 ax[1, 2].legend()
 
