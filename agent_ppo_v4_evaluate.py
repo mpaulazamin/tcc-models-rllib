@@ -62,10 +62,10 @@ class ShowerEnv(gym.Env):
             ),
         )
 
-        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
+        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 5, 5, 5]),
             dtype=np.float32, 
         )
 
@@ -123,7 +123,8 @@ class ShowerEnv(gym.Env):
         self.D_buffer = np.array([0, 0, 0, 0])  
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb,
+                             self.custo_eletrico, self.custo_gas, self.custo_agua],
                              dtype=np.float32)
         
         return self.obs
@@ -208,7 +209,8 @@ class ShowerEnv(gym.Env):
         self.custo_agua = custo_agua(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb,
+                             self.custo_eletrico, self.custo_gas, self.custo_agua],
                              dtype=np.float32)
 
         # Define a recompensa:
@@ -253,7 +255,7 @@ class ShowerEnv(gym.Env):
                 "xs": self.xs_total,
                 "Fs": self.Fs_total,
                 "iqb": self.iqb,
-                "recompensa": self.reward,
+                "recompensa": reward,
                 "custo_eletrico": self.custo_eletrico,
                 "custo_gas": self.custo_gas,
                 "custo_agua": self.custo_agua,
@@ -276,7 +278,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v4\\checkpoint_000050"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v4\\checkpoint_000005"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
