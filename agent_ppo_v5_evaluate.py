@@ -215,7 +215,10 @@ class ShowerEnv(gym.Env):
 
         # Define a recompensa:
         custos_total = self.custo_eletrico + self.custo_gas + self.custo_agua
-        reward = self.iqb / (self.iqb + custos_total)
+        if self.iqb < 0.6:
+            reward = self.iqb
+        if self.iqb >= 0.6:
+            reward = self.iqb - (custos_total / 10) 
 
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
@@ -278,7 +281,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v4\\checkpoint_000040"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v5\\checkpoint_000050"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:

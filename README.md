@@ -44,31 +44,16 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 Definida como:
 
 ```bash
-recompensa = iqb / (iqb + custos)
+recompensa = iqb, se iqb < 0.6
+recompensa = iqb - (custos / 10), se iqb >= 0.6
 ```
 
 onde _custos_ é a soma de todos os custos (elétrico, gás, água).
 
 ### Resultados
 
-O sistema chega a recompensas próximas de 1, entretanto o IQB fica em torno de 5 ou 6. Isso porque os custos em temperaturas menores são menores, e a razão da recompensa quase se iguala ou fica maior do que a recompensa para temperaturas altas. Pode-se concluir que essa não é uma boa função de recompensa. Por isso, parei o treinamento antes do tempo.
-
-A figura abaixo ilustra um exemplo de 1 episódio completo com o último checkpoint do agente (step 40):
-
-![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v4/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v4.jpg)
+TBD
 
 ### Próximos passos
 
-Testar as seguintes recompensas:
-
-```bash
-recompensa = iqb, se iqb < 0.6
-recompensa = iqb - (custos / 10), se iqb >= 0.6
-```
-
-ou
-
-```bash
-recompensa = iqb - custos
-se recompensa < 0: recompensa = 0
-```
+TBD
