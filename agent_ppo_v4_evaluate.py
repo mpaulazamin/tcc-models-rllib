@@ -212,7 +212,8 @@ class ShowerEnv(gym.Env):
                              dtype=np.float32)
 
         # Define a recompensa:
-        reward = self.iqb
+        custos_total = self.custo_eletrico + self.custo_gas + self.custo_agua
+        reward = self.iqb / (self.iqb + custos_total)
 
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
@@ -252,6 +253,7 @@ class ShowerEnv(gym.Env):
                 "xs": self.xs_total,
                 "Fs": self.Fs_total,
                 "iqb": self.iqb,
+                "recompensa": self.reward,
                 "custo_eletrico": self.custo_eletrico,
                 "custo_gas": self.custo_gas,
                 "custo_agua": self.custo_agua,
@@ -274,7 +276,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1\\checkpoint_000050"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v4\\checkpoint_000050"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
@@ -297,6 +299,7 @@ xf_list = []
 xs_list = []
 Fs_list = []
 iqb_list = []
+recompensa_list = []
 custo_eletrico_list = []
 custo_gas_list = []
 custo_agua_list = []
@@ -342,6 +345,7 @@ for i in range(0, 1):
         xs_list.append(info.get("xs"))
         Fs_list.append(info.get("Fs"))
         iqb_list.append(info.get("iqb"))
+        recompensa_list.append(info.get("recompensa"))
         custo_eletrico_list.append(info.get("custo_eletrico"))
         custo_gas_list.append(info.get("custo_gas"))
         custo_agua_list.append(info.get("custo_agua"))
@@ -390,6 +394,7 @@ ax[0, 1].set_ylabel("Temperatura")
 ax[0, 1].legend()
 
 ax[0, 2].plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
+ax[0, 2].plot(time_actions, recompensa_list, label="Recompensa", color="black", linestyle="solid")
 # ax[0, 2].set_title("Qualidade do banho (IQB)")
 ax[0, 2].set_xlabel("Ações")
 ax[0, 2].set_ylabel("Índice final")
