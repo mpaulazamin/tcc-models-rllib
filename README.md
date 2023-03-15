@@ -1,4 +1,4 @@
-## Agent PPO - V4
+## Agent PPO - V3
 
 Modelo com malha de inventário para o nível do tanque e com controle liga-desliga do boiler. Sem malha cascata, sem split-range.
 
@@ -55,7 +55,7 @@ O sistema chega a recompensas próximas de 1, entretanto o IQB fica em torno de 
 
 A figura abaixo ilustra um exemplo de 1 episódio completo com o último checkpoint do agente (step 40):
 
-![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v4/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v4.jpg)
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v3/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v3.jpg)
 
 ### Próximos passos
 
