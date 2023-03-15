@@ -1,4 +1,4 @@
-## Agent PPO - V3
+## Agent PPO - V2
 
 Modelo com malha cascata para Ts com split-range, malha de inventário para o nível do tanque, e controle liga-desliga no boiler.
 
@@ -58,7 +58,7 @@ Se começarmos Tq em 70 graus, talvez nem seja necessário otimizar os custos ne
 
 A figura abaixo ilustra um exemplo de 1 episódio completo com o último checkpoint do agente (step 50):
 
-![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v3/imagens/avalia%C3%A7%C3%A3o_agente_ppo_v3.jpg)
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v2/imagens/avalia%C3%A7%C3%A3o_agente_ppo_v2.jpg)
 
 ### Próximos passos
 
