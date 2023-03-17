@@ -42,3 +42,8 @@ Treinando o sistema com o ambiente customizado [neste script](https://github.com
 que reproduz o resultado encontrado no [notebook](https://github.com/mpaulazamin/tcc-models-rllib/blob/main/chuveiro_turbinado.ipynb) do professor.
 
 ![check](https://github.com/mpaulazamin/tcc-models-rllib/blob/main/imagens/custom_env.jpg)
+
+## TO-DO
+
+- Separar gráficos em ações e estados
+- Treinar com diferentes temperaturas ambientes
