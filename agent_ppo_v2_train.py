@@ -218,6 +218,7 @@ class ShowerEnv(gym.Env):
 
         # Define a recompensa:
         reward = self.iqb
+        # reward = c1 * self.iqb + c2 * 1 / (self.custo_eletrico / self.custo_eletrico_maximo_14_min)
 
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
