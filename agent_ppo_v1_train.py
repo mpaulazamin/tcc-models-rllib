@@ -19,7 +19,7 @@ from controle_temperatura_saida import modelo_valvula_saida
 from controle_temperatura_saida import calculo_iqb
 from controle_temperatura_saida import custo_eletrico_banho
 from controle_temperatura_saida import custo_gas_banho
-from controle_temperatura_saida import custo_agua
+from controle_temperatura_saida import custo_agua_banho
 
 seed = 33
 random.seed(seed)
@@ -210,7 +210,7 @@ class ShowerEnv(gym.Env):
         self.custo_gas = custo_gas_banho(self.Sa_total, self.potencia_aquecedor, self.custo_gas_kg, self.dt)
 
         # Cálculo do custo da água:
-        self.custo_agua = custo_agua(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
+        self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
         self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb],
