@@ -444,7 +444,7 @@ def custo_gas_banho(Sa, potencia_aquecedor, custo_gas_kg, dt):
     return custo_gas_total 
 
 
-def custo_agua(Fs, custo_agua_m3, tempo):
+def custo_agua_banho(Fs, custo_agua_m3, tempo):
     """Calcula o custo de água do banho.
     A quantidade de litros gasta em um banho é dada pela vazão em L/min multiplicada pelo tempo em minutos do banho.
     Depois, divide-se a quantidade de litros por 1000, para obter a quantidade em m3 gasta durante o banho.
