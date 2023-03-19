@@ -55,7 +55,7 @@ class ShowerEnv(gym.Env):
         # Custo da energia elétrica em kWh, do kg do gás, e do m3 da água:
         self.custo_eletrico_kwh = 2
         self.custo_gas_kg = 1
-        self.custo_agua_m3 = 3
+        self.custo_agua_m3 = 4
 
         # Ações - xq, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
@@ -67,10 +67,10 @@ class ShowerEnv(gym.Env):
             ),
         )
 
-        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
+        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1]),
             dtype=np.float32, 
         )
 
@@ -128,7 +128,7 @@ class ShowerEnv(gym.Env):
         self.D_buffer = np.array([0, 0, 0, 0])  
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb, self.custo_eletrico],
                              dtype=np.float32)
         
         return self.obs
@@ -213,11 +213,12 @@ class ShowerEnv(gym.Env):
         self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb, self.custo_eletrico],
                              dtype=np.float32)
 
         # Define a recompensa:
-        reward = self.iqb
+        custo_eletrico_max = custo_eletrico_banho(1, self.potencia_eletrica, self.custo_eletrico_kwh, 14)
+        reward = (3 * self.iqb + 2 * (1 - (self.custo_eletrico / custo_eletrico_max))) / 5
 
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
@@ -236,7 +237,7 @@ class ShowerEnv(gym.Env):
 
 
 # Folder para checkpoints:
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v5"
 shutil.rmtree(checkpoint_root, ignore_errors=True, onerror=None)
 
 # Folder para os resultados:
@@ -288,7 +289,7 @@ for n in range(1, n_iter):
 # Salva resultados e plota dados do episódio:
 print(results)
 df = pd.DataFrame(data=episode_data)
-df.to_csv("episode_data_agent_ppo_v1.csv")
+df.to_csv("episode_data_agent_ppo_v5.csv")
 
 policy = agent.get_policy()
 model = policy.model

@@ -50,22 +50,22 @@ class ShowerEnv(gym.Env):
         # Custo da energia elétrica em kWh, do kg do gás, e do m3 da água:
         self.custo_eletrico_kwh = 2
         self.custo_gas_kg = 1
-        self.custo_agua_m3 = 3
+        self.custo_agua_m3 = 4
 
         # Ações - xq, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
             (
                 gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=40, high=55, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0.3, high=0.7, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             ),
         )
 
-        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
+        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1]),
             dtype=np.float32, 
         )
 
@@ -123,7 +123,7 @@ class ShowerEnv(gym.Env):
         self.D_buffer = np.array([0, 0, 0, 0])  
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb, self.custo_eletrico],
                              dtype=np.float32)
         
         return self.obs
@@ -208,11 +208,12 @@ class ShowerEnv(gym.Env):
         self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb, self.custo_eletrico],
                              dtype=np.float32)
 
         # Define a recompensa:
-        reward = self.iqb
+        custo_eletrico_max = custo_eletrico_banho(1, self.potencia_eletrica, self.custo_eletrico_kwh, 14)
+        reward = (3 * self.iqb + 2 * (1 - (self.custo_eletrico / custo_eletrico_max))) / 5
 
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
@@ -274,7 +275,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1\\checkpoint_000050"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v5\\checkpoint_000050"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
