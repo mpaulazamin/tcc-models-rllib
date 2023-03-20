@@ -253,6 +253,7 @@ class ShowerEnv(gym.Env):
                 "xs": self.xs_total,
                 "Fs": self.Fs_total,
                 "iqb": self.iqb,
+                "recompensa": reward,
                 "custo_eletrico": self.custo_eletrico,
                 "custo_gas": self.custo_gas,
                 "custo_agua": self.custo_agua,
@@ -275,7 +276,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v5\\checkpoint_000050"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v5\\checkpoint_000075"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
@@ -298,6 +299,7 @@ xf_list = []
 xs_list = []
 Fs_list = []
 iqb_list = []
+recompensa_list = []
 custo_eletrico_list = []
 custo_gas_list = []
 custo_agua_list = []
@@ -343,6 +345,7 @@ for i in range(0, 1):
         xs_list.append(info.get("xs"))
         Fs_list.append(info.get("Fs"))
         iqb_list.append(info.get("iqb"))
+        recompensa_list.append(info.get("recompensa"))
         custo_eletrico_list.append(info.get("custo_eletrico"))
         custo_gas_list.append(info.get("custo_gas"))
         custo_agua_list.append(info.get("custo_agua"))
@@ -379,27 +382,28 @@ fig, ax = plt.subplots(3, 3, figsize=(20, 17))
 ax[0, 0].plot(time_total, Ts, label="Ts", color="royalblue", linestyle="solid")
 ax[0, 0].plot(time_total, Tt, label="Tt", color="deepskyblue", linestyle="solid")
 # ax[0, 0].set_title("Temperaturas de saída (Ts) e do tanque (Tt)")
-ax[0, 0].set_xlabel("Tempo")
+# ax[0, 0].set_xlabel("Tempo")
 ax[0, 0].set_ylabel("Temperatura")
 ax[0, 0].legend()
 
 ax[0, 1].plot(time_total, SPTq, label="SPTq", color="purple", linestyle="dashed")
 ax[0, 1].plot(time_total, Tq, label="Tq", color="mediumorchid", linestyle="solid")
 # ax[0, 1].set_title("Temperatura do boiler (Tq)")
-ax[0, 1].set_xlabel("Tempo")
+# ax[0, 1].set_xlabel("Tempo")
 ax[0, 1].set_ylabel("Temperatura")
 ax[0, 1].legend()
 
 ax[0, 2].plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
+ax[0, 2].plot(time_actions, recompensa_list, label="Recompensa", color="violet", linestyle="solid")
 # ax[0, 2].set_title("Qualidade do banho (IQB)")
-ax[0, 2].set_xlabel("Ações")
+# ax[0, 2].set_xlabel("Ações")
 ax[0, 2].set_ylabel("Índice final")
 ax[0, 2].legend()
 
 ax[1, 0].plot(time_total, SPh, label="SPh", color="darkslategray", linestyle="dashed")
 ax[1, 0].plot(time_total, h, label="h", color="teal", linestyle="solid")
 # ax[1, 0].set_title("Nível do tanque (h)")
-ax[1, 0].set_xlabel("Tempo")
+# ax[1, 0].set_xlabel("Tempo")
 ax[1, 0].set_ylabel("Nível")
 ax[1, 0].legend()
 
@@ -407,7 +411,7 @@ ax[1, 1].plot(time_total, xq, label="xq", color="darkmagenta", linestyle="solid"
 ax[1, 1].plot(time_total, xf, label="xf", color="deeppink", linestyle="solid")
 ax[1, 1].plot(time_total, xs, label="xs", color="palevioletred", linestyle="solid")
 # ax[1, 1].set_title("Aberturas das válvulas quente (xq), fria (xf) e de saída (xs)")
-ax[1, 1].set_xlabel("Tempo")
+# ax[1, 1].set_xlabel("Tempo")
 ax[1, 1].set_ylabel("Abertura")
 ax[1, 1].legend()
 
@@ -415,7 +419,7 @@ ax[1, 2].plot(time_actions, custo_eletrico_list, label="Custo elétrico", color=
 ax[1, 2].plot(time_actions, custo_gas_list, label="Custo do gás", color="gray", linestyle="solid")
 ax[1, 2].plot(time_actions, custo_agua_list, label="Custo da água", color="dodgerblue", linestyle="solid")
 # ax[1, 2].set_title("Custos do banho")
-ax[1, 2].set_xlabel("Ações")
+# ax[1, 2].set_xlabel("Ações")
 ax[1, 2].set_ylabel("Custos")
 ax[1, 2].legend()
 

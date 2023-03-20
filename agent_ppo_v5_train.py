@@ -260,7 +260,7 @@ results = []
 episode_data = []
 
 # Realiza o treinamento:
-n_iter = 51
+n_iter = 76
 for n in range(1, n_iter):
 
     # Treina o agente:
