@@ -143,7 +143,7 @@ class ShowerEnv(gym.Env):
         self.xs = round(action[2][0], 2)
 
         # Fração da resistência elétrica
-        self.Sr = action[3][0] / 10
+        self.Sr = action[3]/ 10
 
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
