@@ -1,4 +1,4 @@
-## Agent PPO - V5
+## Agent PPO - V6
 
 Modelo com malha de inventário para o nível do tanque e com controle liga-desliga do boiler. Sem malha cascata, sem split-range.
 
@@ -9,7 +9,7 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 - xq: 0.01 a 0.99 - contínuo
 - SPTq: 30 a 70 - contínuo
 - xs: 0.3 a 0.7 - contínuo
-- Sr: 0 a 1 - contínuo
+- Sr: 0 a 10 - discreto (depois divide-se cada valor por 10)
 
 ### Espaço de estados
 
@@ -46,10 +46,11 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 Definida como:
 
 ```bash
-recompensa = (3 * iqb + 2 * (1 - (custo_eletrico / custo_eletrico_max))) / 5
+    if Sr == 0:
+        reward = (3 * iqb + 2) / 5 
+    else:
+        reward = (3 * iqb + 2 * (1 - Sr)) / 5
 ```
-
-onde `custo_eletrico_max = 2.566666666666667`
 
 ### Resultados
 

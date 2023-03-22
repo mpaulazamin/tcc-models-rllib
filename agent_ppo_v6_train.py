@@ -63,7 +63,7 @@ class ShowerEnv(gym.Env):
                 gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0.3, high=0.7, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
+                gym.spaces.Discrete(11, start=0),
             ),
         )
 
@@ -148,7 +148,7 @@ class ShowerEnv(gym.Env):
         self.xs = round(action[2][0], 2)
 
         # Fração da resistência elétrica
-        self.Sr = round(action[3][0], 2)
+        self.Sr = action[3][0] / 10
 
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
@@ -217,8 +217,10 @@ class ShowerEnv(gym.Env):
                              dtype=np.float32)
 
         # Define a recompensa:
-        custo_eletrico_max = custo_eletrico_banho(1, self.potencia_eletrica, self.custo_eletrico_kwh, 14)
-        reward = (3 * self.iqb + 2 * (1 - (self.custo_eletrico / custo_eletrico_max))) / 5
+        if self.Sr == 0:
+            reward = (3 * self.iqb + 2) / 5 
+        else:
+            reward = (3 * self.iqb + 2 * (1 - self.Sr)) / 5
 
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
@@ -237,7 +239,7 @@ class ShowerEnv(gym.Env):
 
 
 # Folder para checkpoints:
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v5"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v6"
 shutil.rmtree(checkpoint_root, ignore_errors=True, onerror=None)
 
 # Folder para os resultados:
@@ -289,7 +291,7 @@ for n in range(1, n_iter):
 # Salva resultados e plota dados do episódio:
 print(results)
 df = pd.DataFrame(data=episode_data)
-df.to_csv("episode_data_agent_ppo_v5.csv")
+df.to_csv("episode_data_agent_ppo_v6.csv")
 
 policy = agent.get_policy()
 model = policy.model
