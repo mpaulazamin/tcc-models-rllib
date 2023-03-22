@@ -7,7 +7,7 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 ### Espaço de ações
 
 - xq: 0.01 a 0.99 - contínuo
-- SPTq: 30 a 70 - contínuo
+- SPTq: 40 a 70 - contínuo
 - xs: 0.3 a 0.7 - contínuo
 - Sr: 0 a 10 - discreto (depois divide-se cada valor por 10)
 
@@ -46,10 +46,7 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 Definida como:
 
 ```bash
-    if Sr == 0:
-        reward = (3 * iqb + 2) / 5 
-    else:
-        reward = (3 * iqb + 2 * (1 - Sr)) / 5
+reward = 4 * iqb + 2 * (1 - Sr)
 ```
 
 ### Resultados
