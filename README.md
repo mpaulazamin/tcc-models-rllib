@@ -56,3 +56,9 @@ TBD
 ### Próximos passos
 
 Treinar `agent_ppo_v2` com esta recompensa, mas sem o split-range. 
+
+Treinar com a recompensa: 
+
+```bash
+reward = 3 * iqb + 0.01 * (1 / (custo_eletrico / custo_eletrico_max))
+```
