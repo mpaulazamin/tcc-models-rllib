@@ -215,7 +215,10 @@ class ShowerEnv(gym.Env):
                              dtype=np.float32)
 
         # Define a recompensa:
-        reward = 3 * self.iqb + 0.01 * (1 / (self.custo_eletrico / self.custo_eletrico_max))
+        if self.Sr == 0:
+            reward = 3 * self.iqb + 1
+        else:
+            reward = 3 * self.iqb + 0.01 * (1 / (self.custo_eletrico / self.custo_eletrico_max))
 
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao

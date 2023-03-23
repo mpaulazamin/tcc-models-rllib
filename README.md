@@ -46,7 +46,10 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 Definida como:
 
 ```bash
-reward = 3 * iqb + 0.01 * (1 / (custo_eletrico / custo_eletrico_max))
+if Sr == 0:
+    reward = 3 * iqb + 1
+else:
+    reward = 3 * iqb + 0.01 * (1 / (custo_eletrico / custo_eletrico_max))
 ```
 
 ### Resultados
