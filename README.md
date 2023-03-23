@@ -55,4 +55,4 @@ TBD
 
 ### Próximos passos
 
-TBD
+Treinar `agent_ppo_v2` com esta recompensa, mas sem o split-range. 

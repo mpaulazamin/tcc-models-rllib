@@ -275,7 +275,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v6\\checkpoint_000045"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v6\\checkpoint_000060"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
@@ -283,7 +283,7 @@ env = ShowerEnv()
 done = False
 obs = env.reset()
 
-# Para visualização
+# Para visualização:
 SPTq_list = []
 Tq_list = []
 SPh_list = []
@@ -393,7 +393,7 @@ ax[0, 1].set_ylabel("Temperatura")
 ax[0, 1].legend()
 
 ax[0, 2].plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
-ax[0, 2].plot(time_actions, recompensa_list, label="Recompensa", color="violet", linestyle="solid")
+# ax[0, 2].plot(time_actions, recompensa_list, label="Recompensa", color="violet", linestyle="solid")
 # ax[0, 2].set_title("Qualidade do banho (IQB)")
 # ax[0, 2].set_xlabel("Ações")
 ax[0, 2].set_ylabel("Índice final")
