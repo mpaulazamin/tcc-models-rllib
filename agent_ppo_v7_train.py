@@ -57,6 +57,9 @@ class ShowerEnv(gym.Env):
         self.custo_gas_kg = 1
         self.custo_agua_m3 = 4
 
+        # Custo elétrico máximo:
+        self.custo_eletrico_max = custo_eletrico_banho(1, self.potencia_eletrica, self.custo_eletrico_kwh, 14)
+
         # Ações - xq, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
             (
@@ -217,7 +220,7 @@ class ShowerEnv(gym.Env):
                              dtype=np.float32)
 
         # Define a recompensa:
-        reward = 4 * self.iqb + 2 * (1 - self.Sr)
+        reward = 3 * self.iqb + 0.01 * (1 / (self.custo_eletrico / self.custo_eletrico_max))
 
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
@@ -236,7 +239,7 @@ class ShowerEnv(gym.Env):
 
 
 # Folder para checkpoints:
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v6"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v7"
 shutil.rmtree(checkpoint_root, ignore_errors=True, onerror=None)
 
 # Folder para os resultados:
@@ -259,7 +262,7 @@ results = []
 episode_data = []
 
 # Realiza o treinamento:
-n_iter = 76
+n_iter = 51
 for n in range(1, n_iter):
 
     # Treina o agente:
@@ -288,7 +291,7 @@ for n in range(1, n_iter):
 # Salva resultados e plota dados do episódio:
 print(results)
 df = pd.DataFrame(data=episode_data)
-df.to_csv("episode_data_agent_ppo_v6.csv")
+df.to_csv("episode_data_agent_ppo_v7.csv")
 
 policy = agent.get_policy()
 model = policy.model

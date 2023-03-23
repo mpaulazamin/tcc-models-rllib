@@ -35,7 +35,7 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 - Tempo de cada iteração: 2 minutos
 - Tempo total de cada episódio: 14 minutos
 - 7 ações em cada episódio
-- 75 steps no PPO, totalizando 300000 episódios
+- 50 steps no PPO, totalizando 200000 episódios
 
 ### Parâmetros do PPO
 
@@ -46,7 +46,7 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 Definida como:
 
 ```bash
-reward = 4 * iqb + 2 * (1 - Sr)
+reward = 3 * iqb + 0.01 * (1 / (custo_eletrico / custo_eletrico_max))
 ```
 
 ### Resultados
@@ -55,10 +55,4 @@ TBD
 
 ### Próximos passos
 
-Treinar `agent_ppo_v2` com esta recompensa, mas sem o split-range. 
-
-Treinar com a recompensa: 
-
-```bash
-reward = 3 * iqb + 0.01 * (1 / (custo_eletrico / custo_eletrico_max))
-```
+TBD
