@@ -1,14 +1,14 @@
-## Agent PPO - V6
+## Agent PPO - V9
 
 Modelo com malha de inventário para o nível do tanque e com controle liga-desliga do boiler. Sem malha cascata, sem split-range.
 
-![chuveiro](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v1/imagens/chuveiro_controle_h.jpg)
+![chuveiro](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v1/imagens/chuveiro_controle_h_t4a.jpg)
 
 ### Espaço de ações
 
-- xq: 0.01 a 0.99 - contínuo
-- SPTq: 40 a 70 - contínuo
-- xs: 0.3 a 0.7 - contínuo
+- SPTs: 30 a 40 - contínuo
+- SPTq: 30 a 70 - contínuo
+- xs: 0.01 a 0.99 - contínuo
 - Sr: 0 a 10 - discreto (depois divide-se cada valor por 10)
 
 ### Espaço de estados
@@ -18,6 +18,7 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 - Tt: 0 a 100
 - h: 0 a 10000
 - Fs: 0 a 100
+- xq: 0 a 1
 - xf: 0 a 1
 - iqb: 0 a 1
 - custo_eletrico: 0 a 1
