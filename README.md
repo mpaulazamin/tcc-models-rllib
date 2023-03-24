@@ -54,8 +54,12 @@ else:
 
 ### Resultados
 
-TBD
+O sistema consegue chegar a IQBs bons quase nem utilizar a energia elétrica. Entretanto, talvez se o sistema com malha cascata sem o split-range for utilizando, talvez o agente tenha mais controle sobre SPTs. Por exemplo, na segunda ação, Ts vai para aproximadamente 39 graus, o que não é uma temperatura baixa, mas gera um IQB ruim.
+
+A figura abaixo apresenta o sistema após o agente ser treinado com 75 steps:
+
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v7/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v7.jpg)
 
 ### Próximos passos
 
-TBD
+Treinar agent_ppo_v2 com essa mesma recompensa, mas sem o split-range. Depois, incluir os outros custos na recompensa.
