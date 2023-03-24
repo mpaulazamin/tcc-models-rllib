@@ -151,8 +151,8 @@ class ShowerEnv(gym.Env):
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
             [   
-                [self.tempo_inicial, self.SPTq, self.SPh, self.xq, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
-                [self.tempo_final, self.SPTq, self.SPh, self.xq, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr]
+                [self.tempo_inicial, self.SPTq, self.SPh, self.SPTs, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
+                [self.tempo_final, self.SPTq, self.SPh, self.SPTs, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr]
             ]
         )
 
@@ -234,6 +234,7 @@ class ShowerEnv(gym.Env):
         self.SPh_total = np.repeat(self.SPh, 201)
         self.h_total = self.YY[:,1]
         self.Tt_total = self.YY[:,2]
+        self.SPTs_total = np.repeat(self.SPTs, 201)
         self.Ts_total = self.YY[:,3]
         self.xq_total = self.UU[:,2]
         self.xf_total = self.UU[:,1]
@@ -250,6 +251,7 @@ class ShowerEnv(gym.Env):
                 "SPh": self.SPh_total,
                 "h": self.h_total,
                 "Tt": self.Tt_total,
+                "SPTs": self.SPTs_total,
                 "Ts": self.Ts_total,
                 "Sr": self.Sr_total,
                 "Sa": self.Sa_total,
@@ -281,7 +283,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v8\\checkpoint_000050"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v8\\checkpoint_000020"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
@@ -342,6 +344,7 @@ for i in range(0, 1):
         SPh_list.append(info.get("SPh"))
         h_list.append(info.get("h"))
         Tt_list.append(info.get("Tt"))
+        SPTs_list.append(info.get("SPTs"))
         Ts_list.append(info.get("Ts"))
         Sr_list.append(info.get("Sr"))
         Sa_list.append(info.get("Sa"))
@@ -368,6 +371,7 @@ Tq = np.concatenate(Tq_list, axis=0)
 SPh = np.concatenate(SPh_list, axis=0)
 h = np.concatenate(h_list, axis=0)
 Tt = np.concatenate(Tt_list, axis=0)
+SPTs = np.concatenate(SPTs_list, axis=0)
 Ts = np.concatenate(Ts_list, axis=0)
 Sr = np.concatenate(Sr_list, axis=0)
 Sa = np.concatenate(Sa_list, axis=0)
@@ -384,6 +388,7 @@ Tinf = np.concatenate(Tinf_list, axis=0)
 sns.set_style("darkgrid")
 fig, ax = plt.subplots(3, 3, figsize=(20, 17))
 
+ax[0, 0].plot(time_total, SPTs, label="SPTs", color="navy", linestyle="dashed")
 ax[0, 0].plot(time_total, Ts, label="Ts", color="royalblue", linestyle="solid")
 ax[0, 0].plot(time_total, Tt, label="Tt", color="deepskyblue", linestyle="solid")
 # ax[0, 0].set_title("Temperaturas de saída (Ts) e do tanque (Tt)")
