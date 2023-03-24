@@ -60,20 +60,20 @@ class ShowerEnv(gym.Env):
         # Custo elétrico máximo:
         self.custo_eletrico_max = custo_eletrico_banho(1, self.potencia_eletrica, self.custo_eletrico_kwh, 14)
 
-        # Ações - xq, SPTq, xs, Sr:
+        # Ações - SPTs, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
             (
+                gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=40, high=70, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=0.3, high=0.7, shape=(1,), dtype=np.float32),
                 gym.spaces.Discrete(11, start=0),
             ),
         )
 
-        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico:
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 1]),
             dtype=np.float32, 
         )
 
@@ -131,7 +131,7 @@ class ShowerEnv(gym.Env):
         self.D_buffer = np.array([0, 0, 0, 0])  
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb, self.custo_eletrico],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb, self.custo_eletrico],
                              dtype=np.float32)
         
         return self.obs
@@ -141,16 +141,16 @@ class ShowerEnv(gym.Env):
         # Tempo de cada iteração:
         self.tempo_final = self.tempo_inicial + self.tempo_iteracao
 
-        # Abertura da válvula quente:
-        self.xq = round(action[0][0], 2)
+        # Setpoint da temperatura de saída:
+        self.SPTs = round(action[0][0], 1)
 
-        # Fração de aquecimento do boiler:
+        # Setpoint da temperatura do boiler:
         self.SPTq = round(action[1][0], 1)
 
         # Abertura da válvula de saída:
         self.xs = round(action[2][0], 2)
 
-        # Fração da resistência elétrica
+        # Fração da resistência elétrica:
         self.Sr = action[3] / 10
 
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
@@ -216,7 +216,7 @@ class ShowerEnv(gym.Env):
         self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xf, self.iqb, self.custo_eletrico],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb, self.custo_eletrico],
                              dtype=np.float32)
 
         # Define a recompensa:
@@ -242,7 +242,7 @@ class ShowerEnv(gym.Env):
 
 
 # Folder para checkpoints:
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v7"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v9"
 shutil.rmtree(checkpoint_root, ignore_errors=True, onerror=None)
 
 # Folder para os resultados:
@@ -294,7 +294,7 @@ for n in range(1, n_iter):
 # Salva resultados e plota dados do episódio:
 print(results)
 df = pd.DataFrame(data=episode_data)
-df.to_csv("episode_data_agent_ppo_v7.csv")
+df.to_csv("episode_data_agent_ppo_v9.csv")
 
 policy = agent.get_policy()
 model = policy.model

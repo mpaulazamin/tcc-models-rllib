@@ -330,7 +330,7 @@ def simulacao_malha_temperatura(SYS, Y0, UT, dt, I_buffer, D_buffer, Tinf, split
         UU[k, 0] = controle_boiler_on_off(UU[k-1, 0], YY[k, 0], SP[k, 0] - 1, SP[k, 0] + 1)
         
         # Malhas de controle PIDs:
-        for jj in [1]:
+        for jj in [1, 2]:
 
             # Malha cascata:
             if jj == 2:
