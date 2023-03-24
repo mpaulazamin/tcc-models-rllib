@@ -53,7 +53,7 @@ class ShowerEnv(gym.Env):
         self.potencia_aquecedor = 29000
 
         # Custo da energia elétrica em kWh, do kg do gás, e do m3 da água:
-        self.custo_eletrico_kwh = 1
+        self.custo_eletrico_kwh = 2
         self.custo_gas_kg = 3
         self.custo_agua_m3 = 4
 

@@ -30,7 +30,7 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 - Td: 25
 - Tf: 25
 - Tinf: 25
-- custo_eletrico_kwh: 1
+- custo_eletrico_kwh: 2
 - custo_gas_kg: 3
 
 ### Episódios
