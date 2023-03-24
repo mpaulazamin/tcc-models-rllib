@@ -1,4 +1,4 @@
-## Agent PPO - V9
+## Agent PPO - V8
 
 Modelo com malha de inventário para o nível do tanque e com controle liga-desliga do boiler. Sem malha cascata, sem split-range.
 
