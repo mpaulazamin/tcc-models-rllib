@@ -59,7 +59,7 @@ O sistema consegue chegar a IQBs acima de 0.8 sem utilizar a energia elétrica.
 
 A figura abaixo apresenta o sistema após o agente ser treinado com 50 steps:
 
-![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v8/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v8.jpg)
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v8/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v8.png)
 
 ### Próximos passos
 
