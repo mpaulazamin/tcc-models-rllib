@@ -8,7 +8,7 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 
 - SPTs: 30 a 40 - contínuo
 - SPTq: 30 a 70 - contínuo
-- xs: 0.01 a 0.99 - contínuo
+- xs: 0.1 a 0.99 - contínuo (alterei para não ter que lidar com custo da água sendo zero)
 - Sr: 0 a 10 - discreto (depois divide-se cada valor por 10)
 
 ### Espaço de estados

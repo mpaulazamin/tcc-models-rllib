@@ -68,7 +68,7 @@ class ShowerEnv(gym.Env):
             (
                 gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=0.1, high=0.99, shape=(1,), dtype=np.float32),
                 gym.spaces.Discrete(11, start=0),
             ),
         )
