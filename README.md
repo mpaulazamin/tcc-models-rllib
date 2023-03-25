@@ -53,8 +53,8 @@ onde `custo_eletrico_max = 2.566666666666667`
 
 ### Resultados
 
-TBD
+Não deu certo.
 
 ### Próximos passos
 
-TBD
+Não deu certo.
