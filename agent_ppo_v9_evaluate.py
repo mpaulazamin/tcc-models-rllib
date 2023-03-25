@@ -73,10 +73,10 @@ class ShowerEnv(gym.Env):
             ),
         )
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico:
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 1, 1, 1]),
             dtype=np.float32, 
         )
 
@@ -133,8 +133,9 @@ class ShowerEnv(gym.Env):
         self.I_buffer = self.Kp * self.Y0[id] * (1 - self.b)
         self.D_buffer = np.array([0, 0, 0, 0])  
 
-        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb, self.custo_eletrico],
+        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, 
+                             self.iqb, self.custo_eletrico, self.custo_gas, self.custo_agua],
                              dtype=np.float32)
         
         return self.obs
@@ -219,7 +220,8 @@ class ShowerEnv(gym.Env):
         self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb, self.custo_eletrico],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, 
+                             self.iqb, self.custo_eletrico, self.custo_gas, self.custo_agua],
                              dtype=np.float32)
 
         # Define a recompensa:

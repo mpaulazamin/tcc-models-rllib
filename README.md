@@ -23,6 +23,7 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 - iqb: 0 a 1
 - custo_eletrico: 0 a 1
 - custo_gas: 0 a 1
+- custo_agua: 0 a 1
 
 ### Variáveis fixas
 
