@@ -47,3 +47,16 @@ que reproduz o resultado encontrado no [notebook](https://github.com/mpaulazamin
 
 - Separar gráficos em ações e estados
 - Treinar com diferentes temperaturas ambientes
+
+## Observações
+
+### Observações
+
+- Entender qual abordagem controla melhor o sistema: o agente altera diretamente os setpoints, ou ele otimiza os setpoins. Para isso, treinar as duas abordagens somente com o IQB como recompensa. De acordo com os modelos treinados, é possível perceber que o agente controla melhor o sistema no papel de otimizador de setpoints;
+- O sistema com o agente otimizando o split-range já realiza uma otimização de custos;
+- Algumas opções de experimentos considerando os seguintes sistemas: 1) sistema com controle de nível de tanque e controle do boiler; 2) sistema com controle de nível de tanque, controle do boiler e malha cascata; 3) sistema com controle de nível de tanque, controle do boiler, malha cascata e split-range:
+  - Fixar os custos e treinar os sistemas 1 e 2 com temperaturas ambiente diferentes (dia frio, ameno e quente). Entender qual terá um melhor controle do sistema.
+  - Fixar os custos e treinar os sistemas 2 e 3 com temperaturas ambiente diferentes (dia frio, ameno e quente). Entender se o sistema 2 consegue chegar em custos similares da energia elétrica que o sistema 3. Incluir custo do gás e água na recompensa?
+  - Fixar os custos e treinar os sistemas 1, 2 e 3 com temperaturas ambiente diferentes (dia frio, ameno e quente).
+  - Fixar os custos e treinar somente o sistema 2 com temperaturas ambiente diferentes (dia frio, ameno e quente).
+- Sistema multiagente com custos variando poderia estar nos próximos passos da conclusão.
