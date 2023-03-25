@@ -57,7 +57,11 @@ class ShowerEnv(gym.Env):
 
         # Custo de gás máximo:
         Sa_max = np.repeat(1, 1400)
-        self.custo_gas_max = custo_gas_banho(Sa_max, self.potencia_aquecedor, self.custo_gas_kg, 0.01)
+        self.custo_gas_max = custo_gas_banho(Sa_max, self.potencia_aquecedor, self.custo_gas_kg, 14)
+
+        # Custo de água máximo:
+        Fs_max = modelo_valvula_saida(0.99)
+        self.custo_agua_max = custo_agua_banho(Fs_max, self.custo_agua_m3, 14)
 
         # Ações - SPTs, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
@@ -69,10 +73,10 @@ class ShowerEnv(gym.Env):
             ),
         )
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas:
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 1]),
             dtype=np.float32, 
         )
 
@@ -130,7 +134,7 @@ class ShowerEnv(gym.Env):
         self.D_buffer = np.array([0, 0, 0, 0])  
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb, self.custo_eletrico, self.custo_gas],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb, self.custo_eletrico],
                              dtype=np.float32)
         
         return self.obs
@@ -155,8 +159,8 @@ class ShowerEnv(gym.Env):
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
             [   
-                [self.tempo_inicial, self.SPTq, self.SPh, self.xq, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
-                [self.tempo_final, self.SPTq, self.SPh, self.xq, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr]
+                [self.tempo_inicial, self.SPTq, self.SPh, self.SPTs, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
+                [self.tempo_final, self.SPTq, self.SPh, self.SPTs, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr]
             ]
         )
 
@@ -215,15 +219,15 @@ class ShowerEnv(gym.Env):
         self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb, self.custo_eletrico, self.custo_gas],
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb, self.custo_eletrico],
                              dtype=np.float32)
 
         # Define a recompensa:
         if self.Sr == 0:
-            reward = 3 * self.iqb + 1 + 0.05 * (1 / (self.custo_gas / self.custo_gas_max))
+            reward = 3 * self.iqb + 4 + 0.01 * (1 / (self.custo_gas / self.custo_gas_max)) + 0.01 * (1 / (self.custo_agua / self.custo_agua_max))
         else:
-            reward = 3 * self.iqb + 0.01 * (1 / (self.custo_eletrico / self.custo_eletrico_max)) + 0.05 * (1 / (self.custo_gas / self.custo_gas_max))
-
+            reward = 3 * self.iqb + 0.05 * (1 / (self.custo_eletrico / self.custo_eletrico_max)) + 0.01 * (1 / (self.custo_gas / self.custo_gas_max)) + 0.01 * (1 / (self.custo_agua / self.custo_agua_max))
+        
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
 
@@ -231,12 +235,14 @@ class ShowerEnv(gym.Env):
         done = False
         if self.tempo_final == 14 or self.h > 100: 
             done = True
+
         # Para visualização:
         self.SPTq_total = np.repeat(self.SPTq, 201)
         self.Tq_total = self.YY[:,0]
         self.SPh_total = np.repeat(self.SPh, 201)
         self.h_total = self.YY[:,1]
         self.Tt_total = self.YY[:,2]
+        self.SPTs_total = np.repeat(self.SPTs, 201)
         self.Ts_total = self.YY[:,3]
         self.xq_total = self.UU[:,2]
         self.xf_total = self.UU[:,1]
@@ -253,6 +259,7 @@ class ShowerEnv(gym.Env):
                 "SPh": self.SPh_total,
                 "h": self.h_total,
                 "Tt": self.Tt_total,
+                "SPTs": self.SPTs_total,
                 "Ts": self.Ts_total,
                 "Sr": self.Sr_total,
                 "Sa": self.Sa_total,
@@ -345,6 +352,7 @@ for i in range(0, 1):
         SPh_list.append(info.get("SPh"))
         h_list.append(info.get("h"))
         Tt_list.append(info.get("Tt"))
+        SPTs_list.append(info.get("SPTs"))
         Ts_list.append(info.get("Ts"))
         Sr_list.append(info.get("Sr"))
         Sa_list.append(info.get("Sa"))
@@ -371,6 +379,7 @@ Tq = np.concatenate(Tq_list, axis=0)
 SPh = np.concatenate(SPh_list, axis=0)
 h = np.concatenate(h_list, axis=0)
 Tt = np.concatenate(Tt_list, axis=0)
+SPTs = np.concatenate(SPTs_list, axis=0)
 Ts = np.concatenate(Ts_list, axis=0)
 Sr = np.concatenate(Sr_list, axis=0)
 Sa = np.concatenate(Sa_list, axis=0)
@@ -387,6 +396,7 @@ Tinf = np.concatenate(Tinf_list, axis=0)
 sns.set_style("darkgrid")
 fig, ax = plt.subplots(3, 3, figsize=(20, 17))
 
+ax[0, 0].plot(time_total, SPTs, label="SPTs", color="navy", linestyle="dashed")
 ax[0, 0].plot(time_total, Ts, label="Ts", color="royalblue", linestyle="solid")
 ax[0, 0].plot(time_total, Tt, label="Tt", color="deepskyblue", linestyle="solid")
 # ax[0, 0].set_title("Temperaturas de saída (Ts) e do tanque (Tt)")

@@ -79,7 +79,7 @@ def controle_pid(SP, PV, j, I_buffer, D_buffer, dt, Kp, Ti, Td, b, c, N, UU_bias
     return np.array([Uop, I, D])
 
 
-def controle_boiler_on_off(Uop, medido, minimo, maximo):
+def controle_boiler_on_off(Uop, medido, minimo, maximo, xq=0.2):
     """Controle liga e desliga do boiler.
 
     Argumentos:
@@ -87,6 +87,7 @@ def controle_boiler_on_off(Uop, medido, minimo, maximo):
         medido (float): Valor medido para a temperatura do boiler (Tq).
         minimo (float): Valor mínimo para a temperatura do boiler.
         maximo (float): Valor máximo para a temperatura do boiler.
+        xq (float): Abertura da válvula de corrente quente.
     
     Retorna:
         Uop (int): Variável de controle do seletor do boiler (Sa).
@@ -94,6 +95,10 @@ def controle_boiler_on_off(Uop, medido, minimo, maximo):
     if medido < minimo:
         Uop = 1
     elif medido > maximo:
+        Uop = 0
+
+    # Desliga o sistema de aquecimento se não estiver passando água
+    if xq < 0.15:
         Uop = 0
 
     return Uop
@@ -327,7 +332,7 @@ def simulacao_malha_temperatura(SYS, Y0, UT, dt, I_buffer, D_buffer, Tinf, split
         
         # Controle liga e desliga do boiler: malha 0
         SP[k, 0] = UU[k, 0]
-        UU[k, 0] = controle_boiler_on_off(UU[k-1, 0], YY[k, 0], SP[k, 0] - 1, SP[k, 0] + 1)
+        UU[k, 0] = controle_boiler_on_off(UU[k-1, 0], YY[k, 0], SP[k, 0] - 1, SP[k, 0] + 1, xq=UU[k, 2])
         
         # Malhas de controle PIDs:
         for jj in [1, 2]:

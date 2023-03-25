@@ -1,8 +1,8 @@
 ## Agent PPO - V9
 
-Modelo com malha de inventário para o nível do tanque e com controle liga-desliga do boiler. Sem malha cascata, sem split-range.
+Modelo com malha de inventário para o nível do tanque, com controle liga-desliga do boiler e com malha cascata. Sem split-range.
 
-![chuveiro](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v1/imagens/chuveiro_controle_h_t4a.jpg)
+![chuveiro](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v1/imagens/chuveiro_controle_t4a.jpg)
 
 ### Espaço de ações
 
@@ -50,9 +50,9 @@ Definida como:
 
 ```bash
 if Sr == 0:
-    reward = 3 * iqb + 1 + 0.05 * (1 / (custo_gas / custo_gas_max))
+    reward = 3 * iqb + 4 + 0.01 * (1 / (custo_gas / custo_gas_max)) + 0.01 * (1 / (custo_agua / custo_agua_max))
 else:
-    reward = 3 * iqb + 0.01 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.05 * (1 / (custo_gas / custo_gas_max))
+    reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.01 * (1 / (custo_gas / custo_gas_max)) + 0.01 * (1 / (custo_agua / custo_agua_max))
 ```
 
 ### Resultados
