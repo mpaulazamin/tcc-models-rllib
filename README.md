@@ -8,7 +8,7 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 
 - SPTs: 30 a 40 - contínuo
 - SPTq: 30 a 70 - contínuo
-- xs: 0.1 a 0.99 - contínuo (alterei para não ter que lidar com custo da água sendo zero)
+- xs: 0.01 a 0.99 - contínuo
 - Sr: 0 a 10 - discreto (depois divide-se cada valor por 10)
 
 ### Espaço de estados
@@ -23,7 +23,8 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 - iqb: 0 a 1
 - custo_eletrico: 0 a 1
 - custo_gas: 0 a 1
-- custo_agua: 0 a 1
+
+Não treinei com o custo da água porque os custos são muito baixos, e a recompensa estava ficando muito alta (mais de 3000).
 
 ### Variáveis fixas
 
@@ -51,16 +52,16 @@ Definida como:
 
 ```bash
 if custo_eletrico == 0 and custo_gas != 0:
-    reward = 3 * iqb + 4 + 0.01 * (1 / (custo_gas / custo_gas_max)) + 0.01 * (1 / (custo_agua / custo_agua_max))
+    reward = 3 * iqb + 4 + 0.01 * (1 / (custo_gas / custo_gas_max))
     
 if custo_eletrico != 0 and custo_gas == 0:
-    reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.01 * (1 / (custo_agua / custo_agua_max))
+    reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max))
     
 if custo_eletrico == 0 and custo_gas == 0:
-    reward = 3 * iqb + 0.01 * (1 / (custo_agua / custo_agua_max))
+    reward = 3 * iqb
     
 if custo_eletrico != 0 and custo_gas != 0:
-    reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.01 * (1 / (custo_gas / custo_gas_max)) + 0.01 * (1 / (custo_agua / custo_agua_max))
+    reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.01 * (1 / (custo_gas / custo_gas_max))
 ```
 
 ### Resultados

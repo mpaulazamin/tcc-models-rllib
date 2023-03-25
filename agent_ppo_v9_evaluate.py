@@ -59,10 +59,6 @@ class ShowerEnv(gym.Env):
         Sa_max = np.repeat(1, 1400)
         self.custo_gas_max = custo_gas_banho(Sa_max, self.potencia_aquecedor, self.custo_gas_kg, 14)
 
-        # Custo de água máximo:
-        Fs_max = modelo_valvula_saida(0.99)
-        self.custo_agua_max = custo_agua_banho(Fs_max, self.custo_agua_m3, 14)
-
         # Ações - SPTs, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
             (
@@ -73,10 +69,10 @@ class ShowerEnv(gym.Env):
             ),
         )
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 1, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 1, 1]),
             dtype=np.float32, 
         )
 
@@ -133,9 +129,9 @@ class ShowerEnv(gym.Env):
         self.I_buffer = self.Kp * self.Y0[id] * (1 - self.b)
         self.D_buffer = np.array([0, 0, 0, 0])  
 
-        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas:
         self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, 
-                             self.iqb, self.custo_eletrico, self.custo_gas, self.custo_agua],
+                             self.iqb, self.custo_eletrico, self.custo_gas],
                              dtype=np.float32)
         
         return self.obs
@@ -219,23 +215,23 @@ class ShowerEnv(gym.Env):
         # Cálculo do custo da água:
         self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
-        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas:
         self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, 
-                             self.iqb, self.custo_eletrico, self.custo_gas, self.custo_agua],
+                             self.iqb, self.custo_eletrico, self.custo_gas],
                              dtype=np.float32)
 
         # Define a recompensa:
         if self.custo_eletrico == 0 and self.custo_gas != 0:
-            reward = 3 * self.iqb + 4 + 0.01 * (1 / (self.custo_gas / self.custo_gas_max)) + 0.01 * (1 / (self.custo_agua / self.custo_agua_max))
+            reward = 3 * self.iqb + 4 + 0.01 * (1 / (self.custo_gas / self.custo_gas_max))
             
         if self.custo_eletrico != 0 and self.custo_gas == 0:
-            reward = 3 * self.iqb + 0.05 * (1 / (self.custo_eletrico / self.custo_eletrico_max)) + 0.01 * (1 / (self.custo_agua / self.custo_agua_max))
+            reward = 3 * self.iqb + 0.05 * (1 / (self.custo_eletrico / self.custo_eletrico_max))
             
         if self.custo_eletrico == 0 and self.custo_gas == 0:
-            reward = 3 * self.iqb + 0.01 * (1 / (self.custo_agua / self.custo_agua_max))
+            reward = 3 * self.iqb 
             
         if self.custo_eletrico != 0 and self.custo_gas != 0:
-            reward = 3 * self.iqb + 0.05 * (1 / (self.custo_eletrico / self.custo_eletrico_max)) + 0.01 * (1 / (self.custo_gas / self.custo_gas_max)) + 0.01 * (1 / (self.custo_agua / self.custo_agua_max))
+            reward = 3 * self.iqb + 0.05 * (1 / (self.custo_eletrico / self.custo_eletrico_max)) + 0.01 * (1 / (self.custo_gas / self.custo_gas_max)) 
         
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
