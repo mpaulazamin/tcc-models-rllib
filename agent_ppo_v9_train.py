@@ -61,8 +61,8 @@ class ShowerEnv(gym.Env):
         self.custo_eletrico_max = custo_eletrico_banho(1, self.potencia_eletrica, self.custo_eletrico_kwh, 14)
 
         # Custo de gás máximo:
-        Sa_max = np.repeat(1, 1400)
-        self.custo_gas_max = custo_gas_banho(Sa_max, self.potencia_aquecedor, self.custo_gas_kg, 14)
+        Sa_max = np.repeat(1, 1407) 
+        self.custo_gas_max = custo_gas_banho(Sa_max, self.potencia_aquecedor, self.custo_gas_kg, 0.01)
 
         # Ações - SPTs, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(

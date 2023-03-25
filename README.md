@@ -66,7 +66,7 @@ if custo_eletrico != 0 and custo_gas != 0:
 
 ### Resultados
 
-TBD
+Não funciona, pois o custo do gás varia muito a escala, e é muito difícil de controlar isso. Por exemplo, se Sa for utilizado somente 1 vez durante os 2 minutos inteiros, o valor `1 / (custo_gas / custo_gas_max)` será alto, na casa dos 30. Isso aumenta a recompensa, independendemente se o IQB é bom ou ruim. 
 
 ### Próximos passos
 

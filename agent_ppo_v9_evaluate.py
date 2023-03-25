@@ -56,8 +56,8 @@ class ShowerEnv(gym.Env):
         self.custo_eletrico_max = custo_eletrico_banho(1, self.potencia_eletrica, self.custo_eletrico_kwh, 14)
 
         # Custo de gás máximo:
-        Sa_max = np.repeat(1, 1400)
-        self.custo_gas_max = custo_gas_banho(Sa_max, self.potencia_aquecedor, self.custo_gas_kg, 14)
+        Sa_max = np.repeat(1, 1407)
+        self.custo_gas_max = custo_gas_banho(Sa_max, self.potencia_aquecedor, self.custo_gas_kg, 0.01)
 
         # Ações - SPTs, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
@@ -296,7 +296,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v9\\checkpoint_000050"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v9\\checkpoint_000005"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
