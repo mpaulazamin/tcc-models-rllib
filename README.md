@@ -52,8 +52,8 @@ onde _custos_ é a soma de todos os custos (elétrico, gás, água).
 
 ### Resultados
 
-TBD
+Não deu certo.
 
 ### Próximos passos
 
-TBD
+Não deu certo.
