@@ -50,9 +50,16 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 Definida como:
 
 ```bash
-if Sr == 0:
+if custo_eletrico == 0 and custo_gas != 0:
     reward = 3 * iqb + 4 + 0.01 * (1 / (custo_gas / custo_gas_max)) + 0.01 * (1 / (custo_agua / custo_agua_max))
-else:
+    
+if custo_eletrico != 0 and custo_gas == 0:
+    reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.01 * (1 / (custo_agua / custo_agua_max))
+    
+if custo_eletrico == 0 and custo_gas == 0:
+    reward = 3 * iqb + 0.01 * (1 / (custo_agua / custo_agua_max))
+    
+if custo_eletrico != 0 and custo_gas != 0:
     reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.01 * (1 / (custo_gas / custo_gas_max)) + 0.01 * (1 / (custo_agua / custo_agua_max))
 ```
 
