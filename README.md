@@ -9,7 +9,7 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 - SPTs: 30 a 40 - contínuo
 - SPTq: 30 a 70 - contínuo
 - xs: 0.01 a 0.99 - contínuo
-- Sr: 0 a 10 - discreto (depois divide-se cada valor por 10)
+- Sr: 0 a 1 - contínuo
 
 ### Espaço de estados
 
@@ -23,8 +23,7 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 - iqb: 0 a 1
 - custo_eletrico: 0 a 1
 - custo_gas: 0 a 1
-
-Não treinei com o custo da água porque os custos são muito baixos, e a recompensa estava ficando muito alta (mais de 3000).
+- custo_agua: 0 a 1
 
 ### Variáveis fixas
 
@@ -34,6 +33,7 @@ Não treinei com o custo da água porque os custos são muito baixos, e a recomp
 - Tinf: 25
 - custo_eletrico_kwh: 2
 - custo_gas_kg: 3
+- custo_agua_m3 = 4
 
 ### Episódios
 
@@ -48,7 +48,7 @@ Não treinei com o custo da água porque os custos são muito baixos, e a recomp
 
 ### Recompensa
 
-Definida como:
+Em um primeiro momento, ela foi definida como:
 
 ```bash
 if custo_eletrico == 0 and custo_gas != 0:
@@ -64,11 +64,19 @@ if custo_eletrico != 0 and custo_gas != 0:
     reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.01 * (1 / (custo_gas / custo_gas_max))
 ```
 
+Porém, isso não funciona, pois o custo do gás varia muito a escala, e é muito difícil de controlar isso. Por exemplo, se Sa for utilizado somente 1 vez durante os 2 minutos inteiros, o valor `1 / (custo_gas / custo_gas_max)` será alto, na casa dos 30. Isso aumenta a recompensa, independendemente se o IQB é bom ou ruim. 
+
+Isso pode ser observado [nesse notebook](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/reward.ipynb).
+
+Então, decidi utilizar:
+
+```bash
+reward = 5 * iqb - 2 * custo_eletrico - custo_gas - custo_agua
+```
+
 ### Resultados
 
-Não funciona, pois o custo do gás varia muito a escala, e é muito difícil de controlar isso. Por exemplo, se Sa for utilizado somente 1 vez durante os 2 minutos inteiros, o valor `1 / (custo_gas / custo_gas_max)` será alto, na casa dos 30. Isso aumenta a recompensa, independendemente se o IQB é bom ou ruim. 
-
-Isso pode ser observado [nesse noteboo](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/reward.ipynb).
+TBD
 
 ### Próximos passos
 

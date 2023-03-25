@@ -57,27 +57,20 @@ class ShowerEnv(gym.Env):
         self.custo_gas_kg = 3
         self.custo_agua_m3 = 4
 
-        # Custo elétrico máximo:
-        self.custo_eletrico_max = custo_eletrico_banho(1, self.potencia_eletrica, self.custo_eletrico_kwh, 14)
-
-        # Custo de gás máximo:
-        Sa_max = np.repeat(1, 1407) 
-        self.custo_gas_max = custo_gas_banho(Sa_max, self.potencia_aquecedor, self.custo_gas_kg, 0.01)
-
         # Ações - SPTs, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
             (
                 gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0.1, high=0.99, shape=(1,), dtype=np.float32),
-                gym.spaces.Discrete(11, start=0),
+                gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             ),
         )
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas:
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 1, 1, 1]),
             dtype=np.float32, 
         )
 
@@ -136,7 +129,7 @@ class ShowerEnv(gym.Env):
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas:
         self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, 
-                             self.iqb, self.custo_eletrico, self.custo_gas],
+                             self.iqb, self.custo_eletrico, self.custo_gas, self.custo_agua],
                              dtype=np.float32)
         
         return self.obs
@@ -156,7 +149,7 @@ class ShowerEnv(gym.Env):
         self.xs = round(action[2][0], 2)
 
         # Fração da resistência elétrica:
-        self.Sr = action[3] / 10
+        self.Sr = round(action[3][0], 2)
 
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
@@ -222,21 +215,11 @@ class ShowerEnv(gym.Env):
 
         # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas:
         self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, 
-                             self.iqb, self.custo_eletrico, self.custo_gas],
+                             self.iqb, self.custo_eletrico, self.custo_gas, self.custo_agua],
                              dtype=np.float32)
 
         # Define a recompensa:
-        if self.custo_eletrico == 0 and self.custo_gas != 0:
-            reward = 3 * self.iqb + 4 + 0.01 * (1 / (self.custo_gas / self.custo_gas_max))
-            
-        if self.custo_eletrico != 0 and self.custo_gas == 0:
-            reward = 3 * self.iqb + 0.05 * (1 / (self.custo_eletrico / self.custo_eletrico_max))
-            
-        if self.custo_eletrico == 0 and self.custo_gas == 0:
-            reward = 3 * self.iqb 
-            
-        if self.custo_eletrico != 0 and self.custo_gas != 0:
-            reward = 3 * self.iqb + 0.05 * (1 / (self.custo_eletrico / self.custo_eletrico_max)) + 0.01 * (1 / (self.custo_gas / self.custo_gas_max)) 
+        reward = 5 * self.iqb - 2 * self.custo_eletrico - self.custo_gas - self.custo_agua
         
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
