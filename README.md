@@ -76,8 +76,14 @@ reward = 5 * iqb - 2 * custo_eletrico - custo_gas - custo_agua
 
 ### Resultados
 
-TBD
+O agente consegue controlar bem o sistema, chegando a IQBs próximos a 1, e com o custo da energia elétrica bem reduzido (comparável aos custos quando utiliza-se split-range).
+
+A figura abaixo mostra o sistema com o agente treinado com 50 steps.
+
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v9.png)
 
 ### Próximos passos
 
-TBD
+- Aumentar o número de iterações para melhor convergência.
+- Treinar 3 sistemas com temperaturas ambientes de 20, 25 e 30 graus. Tentar colocar as 3 temperaturas no mesmo agente (seleção aleatória quando a classe é instanciada). Comparar os resultados com o mesmo sistema treinado sem os custos na recompensa.
+- Variar custos?
