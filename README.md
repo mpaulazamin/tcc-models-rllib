@@ -64,7 +64,7 @@ if custo_eletrico != 0 and custo_gas != 0:
     reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.01 * (1 / (custo_gas / custo_gas_max))
 ```
 
-Porém, isso não funciona, pois o custo do gás varia muito a escala, e é muito difícil de controlar isso. Por exemplo, se Sa for utilizado somente 1 vez durante os 2 minutos inteiros, o valor `1 / (custo_gas / custo_gas_max)` será alto, na casa dos 30. Isso aumenta a recompensa, independendemente se o IQB é bom ou ruim. 
+Porém, isso não funciona, pois o custo do gás varia muito a escala, e é muito difícil de controlar isso. Isso também acontece com o custo da água. Por exemplo, se Sa for utilizado somente 1 vez durante os 2 minutos inteiros, o valor `1 / (custo_gas / custo_gas_max)` será alto, na casa dos 30. Isso aumenta a recompensa, independendemente se o IQB é bom ou ruim. 
 
 Isso pode ser observado [nesse notebook](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/reward.ipynb).
 
