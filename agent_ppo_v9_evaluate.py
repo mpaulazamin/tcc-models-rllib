@@ -34,9 +34,9 @@ class ShowerEnv(gym.Env):
 
         # Distúrbios e temperatura ambiente - Fd, Td, Tf, Tinf:
         self.Fd = 0
-        self.Td = 25
-        self.Tf = 25
-        self.Tinf = 25
+        self.Td = 20
+        self.Tf = 20
+        self.Tinf = 20
 
         # Não utiliza split-range:
         self.split_range = 0
@@ -279,7 +279,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v9_Tinf25\\checkpoint_000100"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v9_Tinf20\\checkpoint_000100"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
