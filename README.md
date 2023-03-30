@@ -1,4 +1,4 @@
-## Agent PPO - V9
+## Agent PPO - V10
 
 Modelo com malha de inventário para o nível do tanque, com controle liga-desliga do boiler e com malha cascata. Sem split-range.
 
@@ -21,9 +21,6 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 - xq: 0 a 1
 - xf: 0 a 1
 - iqb: 0 a 1
-- custo_eletrico: 0 a 1
-- custo_gas: 0 a 1
-- custo_agua: 0 a 1
 
 ### Variáveis fixas
 
@@ -48,42 +45,18 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 
 ### Recompensa
 
-Em um primeiro momento, ela foi definida como:
+Definida como:
 
 ```bash
-if custo_eletrico == 0 and custo_gas != 0:
-    reward = 3 * iqb + 4 + 0.01 * (1 / (custo_gas / custo_gas_max))
-    
-if custo_eletrico != 0 and custo_gas == 0:
-    reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max))
-    
-if custo_eletrico == 0 and custo_gas == 0:
-    reward = 3 * iqb
-    
-if custo_eletrico != 0 and custo_gas != 0:
-    reward = 3 * iqb + 0.05 * (1 / (custo_eletrico / custo_eletrico_max)) + 0.01 * (1 / (custo_gas / custo_gas_max))
+reward = iqb
 ```
 
-Porém, isso não funciona, pois o custo do gás varia muito a escala, e é muito difícil de controlar isso. Isso também acontece com o custo da água. Por exemplo, se Sa for utilizado somente 1 vez durante os 2 minutos inteiros, o valor `1 / (custo_gas / custo_gas_max)` será alto, na casa dos 30. Isso aumenta a recompensa, independendemente se o IQB é bom ou ruim. 
-
-Isso pode ser observado [nesse notebook](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/reward.ipynb).
-
-Então, decidi utilizar:
-
-```bash
-reward = 5 * iqb - 2 * custo_eletrico - custo_gas - custo_agua
-```
+Isso foi feito para comparar com os resultados do agent_ppo_v9, onde os custos foram incluídos na recompensa.
 
 ### Resultados
 
-O agente consegue controlar bem o sistema, chegando a IQBs próximos a 1, e com o custo da energia elétrica bem reduzido (comparável aos custos quando utiliza-se split-range).
-
-A figura abaixo mostra o sistema com o agente treinado com 50 steps.
-
-![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v9.png)
+TBD
 
 ### Próximos passos
 
-- Aumentar o número de iterações para melhor convergência.
-- Treinar 3 sistemas com temperaturas ambientes de 20, 25 e 30 graus. Tentar colocar as 3 temperaturas no mesmo agente (seleção aleatória quando a classe é instanciada). Comparar os resultados com o mesmo sistema treinado sem os custos na recompensa.
-- Variar custos?
+TBD
