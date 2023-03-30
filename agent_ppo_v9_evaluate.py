@@ -146,7 +146,7 @@ class ShowerEnv(gym.Env):
         # Fração da resistência elétrica:
         self.Sr = round(action[3][0], 2)
 
-        # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
+        # Variáveis para simulação - tempo, SPTq, SPh, xq, xs, Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
             [   
                 [self.tempo_inicial, self.SPTq, self.SPh, self.SPTs, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
@@ -208,7 +208,7 @@ class ShowerEnv(gym.Env):
         # Cálculo do custo da água:
         self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
-        # Estados - Ts, Tq, Tt, h, Fs, xf, iqb, custo_eletrico, custo_gas:
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas:
         self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, 
                              self.iqb, self.custo_eletrico, self.custo_gas, self.custo_agua],
                              dtype=np.float32)
