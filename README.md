@@ -59,4 +59,4 @@ TBD
 
 ### Próximos passos
 
-TBD
+- Treinar os agentes v9 e v10 com a energia elétrica mais barata.
