@@ -6,9 +6,16 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 
 ### Espaço de ações
 
+Para o primeiro agente (steps=50):
 - xq: 0.01 a 0.99 - contínuo
 - SPTq: 30 a 70 - contínuo
 - xs: 0.3 a 0.7 - contínuo
+- Sr: 0 a 1 - contínuo
+
+Para o segundo agente (steps=100):
+- xq: 0.01 a 0.99 - contínuo
+- SPTq: 30 a 70 - contínuo
+- xs: 0.01 a 0.99 - contínuo
 - Sr: 0 a 1 - contínuo
 
 ### Espaço de estados
@@ -23,21 +30,31 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 
 ### Variáveis fixas
 
+Para o primeiro agente (steps=50):
 - Fd: 0
 - Td: 25
 - Tf: 25
 - Tinf: 25
-- custo_eletrico: 2 em ambos os treinos
-- custo_gas: 1 (steps=50) e 3 com steps=100
-- custo_agua: 3 (steps=50) e 4 (steps=100)
+- custo_eletrico: 2
+- custo_gas: 1
+- custo_agua: 3
+
+Para o segundo agente (steps=100):
+- Fd: 0
+- Td: 25
+- Tf: 25
+- Tinf: 25
+- custo_eletrico: 2
+- custo_gas: 3
+- custo_agua: 4
 
 ### Episódios
 
 - Tempo de cada iteração: 2 minutos
 - Tempo total de cada episódio: 14 minutos
 - 7 ações em cada episódio
-- 50 steps no PPO, totalizando 200000 episódios
-- 100 steps no PPO, totalizando 400000 episódios
+- Primeiro agente: 50 steps no PPO, totalizando 200000 episódios
+- Segundo agente: 100 steps no PPO, totalizando 400000 episódios
 
 ### Parâmetros do PPO
 
@@ -51,7 +68,7 @@ Definida como:
 recompensa = iqb
 ```
 
-### Resultados para steps=50
+### Resultados para o primeiro agente (steps=50)
 
 O sistema consegue atingir IQBs altos (acima de 0.8) a partir de ação 1. Na primeira ação o IQB ainda é baixo por causa do tempo morto do sistema, mas depois ele consegue controlar bem as variáveis sem precisar da malha cascata ou do split-range. 
 

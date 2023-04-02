@@ -62,7 +62,7 @@ class ShowerEnv(gym.Env):
             (
                 gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=0.3, high=0.7, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             ),
         )
@@ -150,7 +150,7 @@ class ShowerEnv(gym.Env):
         # Fração da resistência elétrica
         self.Sr = round(action[3][0], 2)
 
-        # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
+        # Variáveis para simulação - tempo, SPTq, SPh, xq, xs, Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
             [   
                 [self.tempo_inicial, self.SPTq, self.SPh, self.xq, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
@@ -236,7 +236,7 @@ class ShowerEnv(gym.Env):
 
 
 # Folder para checkpoints:
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1_steps100"
 shutil.rmtree(checkpoint_root, ignore_errors=True, onerror=None)
 
 # Folder para os resultados:
@@ -259,7 +259,7 @@ results = []
 episode_data = []
 
 # Realiza o treinamento:
-n_iter = 51
+n_iter = 101
 for n in range(1, n_iter):
 
     # Treina o agente:
@@ -288,7 +288,7 @@ for n in range(1, n_iter):
 # Salva resultados e plota dados do episódio:
 print(results)
 df = pd.DataFrame(data=episode_data)
-df.to_csv("episode_data_agent_ppo_v1.csv")
+df.to_csv("episode_data_agent_ppo_v1_steps100.csv")
 
 policy = agent.get_policy()
 model = policy.model

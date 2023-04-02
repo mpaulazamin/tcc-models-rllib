@@ -49,15 +49,15 @@ class ShowerEnv(gym.Env):
 
         # Custo da energia elétrica em kWh, do kg do gás, e do m3 da água:
         self.custo_eletrico_kwh = 2
-        self.custo_gas_kg = 1
-        self.custo_agua_m3 = 3
+        self.custo_gas_kg = 3
+        self.custo_agua_m3 = 4
 
         # Ações - xq, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
             (
                 gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=40, high=55, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=0.3, high=0.7, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
+                gym.spaces.Box(low=0.01, high=0.99, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
             ),
         )
@@ -145,7 +145,7 @@ class ShowerEnv(gym.Env):
         # Fração da resistência elétrica
         self.Sr = round(action[3][0], 2)
 
-        # Variáveis para simulação - tempo, SPTq, SPh, xq, xs,Tf, Td, Tinf, Fd, Sr:
+        # Variáveis para simulação - tempo, SPTq, SPh, xq, xs, Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
             [   
                 [self.tempo_inicial, self.SPTq, self.SPh, self.xq, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
