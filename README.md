@@ -61,5 +61,5 @@ que reproduz o resultado encontrado no [notebook](https://github.com/mpaulazamin
 
 Atualização: 02/04/2023
 
-- Entender qual é a melhor abordagem para que o agente controle o sistema: otimizando os setpoints ou operando diretamente as válvulas. Utilizar somente IQB como recompensa.
+- Entender qual é a melhor abordagem para que o agente controle o sistema: otimizando os setpoints ou operando diretamente as válvulas. Utilizar somente IQB como recompensa. Rodar 1 agente de cada com Tinf=25 é o suficiente para tirar essa conclusão, ou preciso rodar com outras temperaturas ambientes?
 - A partir da melhor abordagem, entender se o agente consegue otimizar os custos: treinar o sistema com três temperaturas ambientes diferentes (15, 20 e 25), e incluir os custos na recompensa. 
