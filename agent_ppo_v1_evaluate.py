@@ -274,7 +274,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1_steps100\\checkpoint_000100"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v1_steps100\\checkpoint_000005"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
