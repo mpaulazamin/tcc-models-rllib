@@ -25,9 +25,9 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 ### Variáveis fixas
 
 - Fd: 0
-- Td: 25
-- Tf: 25
-- Tinf: 25
+- Td: 15, 20 ou 25
+- Tf: 15, 20 ou 25
+- Tinf: 15, 20 ou 25
 - custo_eletrico_kwh: 2
 - custo_gas_kg: 3
 - custo_agua_m3 = 4
@@ -37,7 +37,8 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 - Tempo de cada iteração: 2 minutos
 - Tempo total de cada episódio: 14 minutos
 - 7 ações em cada episódio
-- 50 steps no PPO, totalizando 200000 episódios
+- 100 steps no PPO, totalizando 400000 episódios
+- 3 modelos, um para cada temperatura ambiente
 
 ### Parâmetros do PPO
 
