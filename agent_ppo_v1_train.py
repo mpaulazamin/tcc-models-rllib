@@ -54,8 +54,8 @@ class ShowerEnv(gym.Env):
 
         # Custo da energia elétrica em kWh, do kg do gás, e do m3 da água:
         self.custo_eletrico_kwh = 2
-        self.custo_gas_kg = 1
-        self.custo_agua_m3 = 3
+        self.custo_gas_kg = 3
+        self.custo_agua_m3 = 4
 
         # Ações - xq, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(

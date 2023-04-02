@@ -27,6 +27,9 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 - Td: 25
 - Tf: 25
 - Tinf: 25
+- custo_eletrico: 2 em ambos os treinos
+- custo_gas: 1 (steps=50) e 3 com steps=100
+- custo_agua: 3 (steps=50) e 4 (steps=100)
 
 ### Episódios
 
@@ -34,6 +37,7 @@ Modelo com malha de inventário para o nível do tanque e com controle liga-desl
 - Tempo total de cada episódio: 14 minutos
 - 7 ações em cada episódio
 - 50 steps no PPO, totalizando 200000 episódios
+- 100 steps no PPO, totalizando 400000 episódios
 
 ### Parâmetros do PPO
 
@@ -47,7 +51,7 @@ Definida como:
 recompensa = iqb
 ```
 
-### Resultados
+### Resultados para steps=50
 
 O sistema consegue atingir IQBs altos (acima de 0.8) a partir de ação 1. Na primeira ação o IQB ainda é baixo por causa do tempo morto do sistema, mas depois ele consegue controlar bem as variáveis sem precisar da malha cascata ou do split-range. 
 
