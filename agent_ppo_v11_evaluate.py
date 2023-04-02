@@ -35,12 +35,9 @@ class ShowerEnv(gym.Env):
 
         # Distúrbios e temperatura ambiente - Fd, Td, Tf, Tinf:
         self.Fd = 0
-        self.Td = 15
-        self.Tf = 15
-        self.Tinf = 15
-
-        # Não utiliza split-range:
-        self.split_range = 0
+        self.Td = 25
+        self.Tf = 25
+        self.Tinf = 25
 
         # Potência da resistência elétrica em kW:
         self.potencia_eletrica = 5.5
@@ -53,13 +50,16 @@ class ShowerEnv(gym.Env):
         self.custo_gas_kg = 3
         self.custo_agua_m3 = 4
 
+        # Fração da resistência elétrica:
+        self.Sr = 0
+
         # Ações - SPTs, SPTq, xs, Sr:
         self.action_space = gym.spaces.Tuple(
             (
                 gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
                 gym.spaces.Box(low=0.1, high=0.99, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=0, high=1, shape=(1,), dtype=np.float32),
+                gym.spaces.Discrete(2, start=0),
             ),
         )
 
@@ -143,8 +143,8 @@ class ShowerEnv(gym.Env):
         # Abertura da válvula de saída:
         self.xs = round(action[2][0], 2)
 
-        # Fração da resistência elétrica:
-        self.Sr = round(action[3][0], 2)
+        # Split-range:
+        self.split_range = action[3]
 
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs, Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
@@ -182,7 +182,7 @@ class ShowerEnv(gym.Env):
         self.Sa_total =  self.UU[:,0]
 
         # Fração da resistência elétrica utilizada durante a iteração:
-        self.Sr = self.UU[:,8][-1]
+        self.Sr_total = self.UU[:,8]
 
         # Valor final da abertura de corrente fria:
         self.xf = self.UU[:,1][-1]
@@ -200,7 +200,7 @@ class ShowerEnv(gym.Env):
         self.iqb = calculo_iqb(self.Ts, self.Fs)
 
         # Cálculo do custo elétrico do banho:
-        self.custo_eletrico = custo_eletrico_banho(self.Sr, self.potencia_eletrica, self.custo_eletrico_kwh, self.tempo_iteracao)
+        self.custo_eletrico = custo_eletrico_banho(self.Sr_total, self.potencia_eletrica, self.custo_eletrico_kwh, self.dt)
 
         # Cálculo do custo de gás do banho:
         self.custo_gas = custo_gas_banho(self.Sa_total, self.potencia_aquecedor, self.custo_gas_kg, self.dt)
@@ -233,7 +233,6 @@ class ShowerEnv(gym.Env):
         self.Ts_total = self.YY[:,3]
         self.xq_total = self.UU[:,2]
         self.xf_total = self.UU[:,1]
-        self.Sr_total = np.repeat(self.Sr, 201)
         self.xs_total = np.repeat(self.xs, 201)
         self.Fs_total = np.repeat(self.Fs, 201)    
         self.Fd_total = np.repeat(self.Fd, 201) 
