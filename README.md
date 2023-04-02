@@ -58,7 +58,7 @@ que reproduz o resultado encontrado no [notebook](https://github.com/mpaulazamin
   - Fixar os custos e treinar os sistemas 1 e 2 com temperaturas ambiente diferentes (dia frio, ameno e quente). Entender qual terá um melhor controle do sistema.
   - Fixar os custos e treinar os sistemas 2 e 3 com temperaturas ambiente diferentes (dia frio, ameno e quente). Entender se o sistema 2 consegue chegar em custos similares da energia elétrica que o sistema 3. Incluir custo do gás e água na recompensa?
   - Fixar os custos e treinar os sistemas 1, 2 e 3 com temperaturas ambiente diferentes (dia frio, ameno e quente).
-  - Fixar os custos e treinar somente o sistema 2 com temperaturas ambiente diferentes (dia frio, ameno e quente).
+  - Fixar os custos e treinar somente o sistema 2 com temperaturas ambiente diferentes (dia frio, ameno e quente). Comparar os resultados com o sistema 2 apenas com o IQB na recompensa, mas também treinado com diferentes temperaturas ambiente.
 - Sistema multiagente com custos variando poderia estar nos próximos passos da conclusão.
 
 Atualização: 02/04/2023
