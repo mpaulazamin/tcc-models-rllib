@@ -78,7 +78,7 @@ Finalmente, talvez seria interessante rodar o sistema com 100 steps (400000 epis
 
 A figura abaixo ilustra um exemplo de 1 episódio completo com o último checkpoint do agente (step 50):
 
-![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v1/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v1.jpg)
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v1/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v1_steps50.jpg)
 
 ### Próximos passos
 
