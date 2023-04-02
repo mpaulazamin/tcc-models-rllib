@@ -60,3 +60,8 @@ que reproduz o resultado encontrado no [notebook](https://github.com/mpaulazamin
   - Fixar os custos e treinar os sistemas 1, 2 e 3 com temperaturas ambiente diferentes (dia frio, ameno e quente).
   - Fixar os custos e treinar somente o sistema 2 com temperaturas ambiente diferentes (dia frio, ameno e quente).
 - Sistema multiagente com custos variando poderia estar nos próximos passos da conclusão.
+
+Atualização: 02/04/2023
+
+- Entender qual é a melhor abordagem para que o agente controle o sistema: otimizando os setpoints ou operando diretamente as válvulas. Utilizar somente IQB como recompensa.
+- A partir da melhor abordagem, entender se o agente consegue otimizar os custos: treinar o sistema com três temperaturas ambientes diferentes (15, 20 e 25), e incluir os custos na recompensa. 
