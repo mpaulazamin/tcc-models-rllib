@@ -277,7 +277,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v10_Tinf15\\checkpoint_000100"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v11_Tinf25\\checkpoint_000100"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
@@ -386,6 +386,34 @@ custo_agua_list_acumulado = list(accumulate(custo_agua_list))
 # print(custo_eletrico_list_acumulado)
 
 # Gráficos:
+sns.set_style("darkgrid")
+fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+
+ax.plot(time_total, SPTs, label="Ação - Setpoint da temperatura de saída", color="navy", linestyle="dashed")
+ax.plot(time_total, Ts, label="Temperatura de saída", color="royalblue", linestyle="solid")
+ax.plot(time_total, Tt, label="Temperatura do tanque", color="deepskyblue", linestyle="solid")
+ax.set_title("Temperaturas de saída e do tanque para configuração B")
+ax.set_xlabel("Tempo em minutos")
+ax.set_ylabel("Temperatura em °C")
+ax.legend()
+plt.show()
+
+fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+ax.plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
+ax.set_title("IQB para configuração B")
+ax.set_xlabel("Ação")
+ax.set_ylabel("Índice")
+ax.legend()
+plt.show()
+
+fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+ax.plot(time_total, Fs, label="Vazão de saída", color="firebrick", linestyle="solid")
+ax.set_title("Vazão de saída para configuração B")
+ax.set_xlabel("Tempo em minutos")
+ax.set_ylabel("Vazão em litros/minutos")
+ax.legend()
+plt.show()
+
 # sns.set_style("darkgrid")
 # fig, ax = plt.subplots(2, 2, figsize=(20, 17))
 
@@ -394,7 +422,7 @@ custo_agua_list_acumulado = list(accumulate(custo_agua_list))
 # ax[0, 0].plot(time_total, Tt, label="Temperatura do tanque (Tt)", color="deepskyblue", linestyle="solid")
 # ax[0, 0].set_title("Temperaturas de saída (Ts) e do tanque (Tt)")
 # ax[0, 0].set_xlabel("Tempo em minutos")
-# ax[0, 0].set_ylabel("Temperatura °C")
+# ax[0, 0].set_ylabel("Temperatura em °C")
 # ax[0, 0].legend()
 
 # ax[0, 1].plot(time_total, SPTq, label="Ação - setpoint da temperatura do boiler (SPTq)", color="purple", linestyle="dashed")
