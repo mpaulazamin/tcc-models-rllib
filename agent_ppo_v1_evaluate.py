@@ -373,6 +373,33 @@ Tinf = np.concatenate(Tinf_list, axis=0)
 
 # Gráficos:
 sns.set_style("darkgrid")
+fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+ax.plot(time_total, Ts, label="Temperatura de saída", color="royalblue", linestyle="solid")
+ax.plot(time_total, Tt, label="Temperatura do tanque", color="deepskyblue", linestyle="solid")
+ax.set_title("Temperaturas de saída e do tanque para configuração A")
+ax.set_xlabel("Tempo em minutos")
+ax.set_ylabel("Temperatura em °C")
+ax.legend()
+plt.show()
+
+fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+ax.plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
+ax.set_title("IQB para configuração A")
+ax.set_xlabel("Ação")
+ax.set_ylabel("Índice")
+ax.legend()
+plt.show()
+
+fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+ax.plot(time_total, Fs, label="Vazão de saída", color="firebrick", linestyle="solid")
+ax.set_title("Vazão de saída para configuração A")
+ax.set_xlabel("Tempo em minutos")
+ax.set_ylabel("Vazão em litros/minutos")
+ax.legend()
+plt.show()
+
+# Gráficos:
+sns.set_style("darkgrid")
 fig, ax = plt.subplots(3, 3, figsize=(20, 17))
 
 ax[0, 0].plot(time_total, Ts, label="Ts", color="royalblue", linestyle="solid")
