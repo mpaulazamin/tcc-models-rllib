@@ -63,3 +63,7 @@ Atualização: 02/04/2023
 
 - Entender qual é a melhor abordagem para que o agente controle o sistema: otimizando os setpoints ou operando diretamente as válvulas. Utilizar somente IQB como recompensa. Rodar 1 agente de cada com Tinf=25 é o suficiente para tirar essa conclusão, ou preciso rodar com outras temperaturas ambientes?
 - A partir da melhor abordagem, entender se o agente consegue otimizar os custos: treinar o sistema com três temperaturas ambientes diferentes (15, 20 e 25), e incluir os custos na recompensa. 
+
+Atualização: 05/04/2023
+- Treinar o agente ao mesmo tempo com temperaturas ambientes diferentes (elas são selecionadas no começo do episódio) e com custos diferentes (selecionados no começo do episódio). Tentar fazer o mesmo mas com diversos agentes (cada agente controla 1 temperatura e 1 custo).
+- Fazer isso com o agente atuando como otimizador versus o agente atuando como operador.
