@@ -83,14 +83,14 @@ def controle_boiler_on_off(Uop, medido, minimo, maximo, xq=0.2):
     """Controle liga e desliga do boiler.
 
     Argumentos:
-        Uop (int): Variável de controle do seletor do boiler (Sa).
+        Uop (int): Variável de controle do selector do boiler (Sa).
         medido (float): Valor medido para a temperatura do boiler (Tq).
         minimo (float): Valor mínimo para a temperatura do boiler.
         maximo (float): Valor máximo para a temperatura do boiler.
         xq (float): Abertura da válvula de corrente quente.
     
     Retorna:
-        Uop (int): Variável de controle do seletor do boiler (Sa).
+        Uop (int): Variável de controle do selector do boiler (Sa).
     """
     if medido < minimo:
         Uop = 1
@@ -163,7 +163,7 @@ def modelo_temperatura_boiler(t, Tq, Fq, Tf, Sa):
         Tq (float): Temperatura de aquecimento do boiler.
         Fq (float): Vazão da válvula do boiler.
         Tf (float): Temperatura da corrente fria.
-        Sa (float): Seletor do aquecimento do boiler. 
+        Sa (float): selector do aquecimento do boiler. 
 
     Retorna:
         Equação diferencial para o modelo do boiler.
@@ -199,7 +199,7 @@ def modelo_temperatura_tanque(t, Tt, Ff, Tf, Fq, Tq, Fd, Td, Sr, h):
         Tq (float): Temperatura de aquecimento do Boiler.
         Fd (float): Vazão da válvula do distúrbio no tanque.
         Td (float): Temperatura da corrente de distúrbio.
-        Sr (float): Seletor da resistência elétrica do tanque de aquecimento.
+        Sr (float): selector da resistência elétrica do tanque de aquecimento.
         h (float): nível do tanque de aquecimento da mistura entre corrente quente e fria.
 
     Retorna:
@@ -231,14 +231,14 @@ def modelagem_sistema(t, Y, Sa, xf, xq, xs, Tf, Td, Tinf, Fd, Sr):
         Y (numpy.array): Condições iniciais para nível do tanque de aquecimento (h), temperatura do boiler (Tq),
             temperatura de saída do tanque de aquecimento (Tt), temperatura de saída do chuveiro (Ts).
         xf (float): Abertura da válvula de corrente fria.
-        Sa (float): Seletor do aquecimento do boiler.
+        Sa (float): selector do aquecimento do boiler.
         xq (float): Abertura da válvula de corrente quente.
         xs (float): Abertura da válvula de saída.
         Tf (float): Temperatura da corrente fria.
         Td (float): Temperatura da corrente de distúrbio.
         Tinf (float): Temperatura ambiente.
         Fd (float): Vazão da válvula do distúrbio no tanque.
-        Sr (float): Seletor da resistência elétrica do tanque de aquecimento.
+        Sr (float): selector da resistência elétrica do tanque de aquecimento.
 
     Retorna:
         numpy.array(): Equações diferenciais ordinárias para serem resolvidas pelo integrador do scipy.
@@ -404,7 +404,7 @@ def custo_eletrico_banho(Sr, potencia_eletrica, custo_eletrico_kwh, dt):
     para Sr será a área da curva (integral).
 
     Argumentos:
-        Sr (float): Seletor da resistência elétrica do tanque de aquecimento.
+        Sr (float): selector da resistência elétrica do tanque de aquecimento.
         potencial_eletrica (float): Potência elétrica do tanque de aquecimento (chuveiro) em kW.
         custo_eletrico_kwh (float): Custo do kWh da energia em reais por hora.
         dt (float): Passo de tempo.
@@ -432,7 +432,7 @@ def custo_gas_banho(Sa, potencia_aquecedor, custo_gas_kg, dt):
         https://www.supergasbras.com.br/super-blog/negocio/2021/qual-a-vantagem-do-poder-calorifico-do-glp#:~:text=GLP%3A%2011.750%20Kcal%2Fkg,G%C3%A1s%20Natural%3A%209.400%20Kcal%2Fm%C2%B3
     
     Argumentos:
-        Sa (float): Seletor do aquecimento do boiler.
+        Sa (float): selector do aquecimento do boiler.
         potencial_aquecedor (float): Potência do aquecedor (boiler) em kcal/h.
         custo_gas_kg (float): Custo do kg do gás em reais por kg.
         tempo (float): Tempo da ação em minutos.

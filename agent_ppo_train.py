@@ -1,0 +1,362 @@
+import ray
+import ray.rllib.agents.ppo as ppo
+from ray.rllib.algorithms.algorithm import Algorithm
+from ray.rllib.policy.policy import Policy
+
+import gymnasium as gym
+import numpy as np
+import random
+import pandas as pd
+import json
+import os
+import shutil
+import sys
+import matplotlib.pyplot as plt
+import pprint
+import glob
+import random
+
+from controle_temperatura_saida import simulacao_malha_temperatura
+from controle_temperatura_saida import modelagem_sistema
+from controle_temperatura_saida import modelo_valvula_saida
+from controle_temperatura_saida import calculo_iqb
+from controle_temperatura_saida import custo_eletrico_banho
+from controle_temperatura_saida import custo_gas_banho
+from controle_temperatura_saida import custo_agua_banho
+
+seed = 33
+random.seed(seed)
+np.random.seed(seed)
+
+
+class ShowerEnv(gym.Env):
+    """Ambiente para simulação do modelo de chuveiro."""
+
+    def __init__(self, env_config):
+
+        # Define variáveis conforme o concept:
+        self.Tinf = env_config["Tinf"]
+        self.custo_eletrico_kwh = env_config["custo_eletrico_kwh"]
+        self.selector = env_config["selector"]
+        self.model = env_config["model"]
+
+        # Tempo de simulação:
+        self.dt = 0.01
+
+        # Tempo de cada iteracao:
+        self.tempo_iteracao = 2
+
+        # Distúrbios e temperatura ambiente - Fd, Td, Tf, Tinf:
+        self.Fd = 0
+        self.Td = 25
+        self.Tf = 25
+        # self.Tinf = 25
+
+        # Potência da resistência elétrica em kW:
+        self.potencia_eletrica = 5.5
+
+        # Potência do aquecedor boiler em kcal/h:
+        self.potencia_aquecedor = 29000
+
+        # Custo da energia elétrica em kWh, do kg do gás, e do m3 da água:
+        # self.custo_eletrico_kwh = 2
+        self.custo_gas_kg = 3
+        self.custo_agua_m3 = 4
+
+        # Fração da resistência elétrica:
+        self.Sr = 0
+
+        # Adiciona o número de concepts caso seja o selector:
+        if self.selector == True:
+            self.action_space = gym.spaces.Discrete(2)
+            self.models = []
+
+            for i in self.model:
+                self.models.append(Policy.from_checkpoint(glob.glob(i+"/*")[-1])['default_policy'])
+
+            self.model = self.models
+            print(self.model)
+
+        else:
+            # Ações - SPTs, SPTq, xs, Sr:
+            self.action_space = gym.spaces.Tuple(
+                (
+                    gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
+                    gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
+                    gym.spaces.Box(low=0.1, high=0.99, shape=(1,), dtype=np.float32),
+                    gym.spaces.Discrete(2, start=0),
+                ),
+            )
+            # self.action_space = gym.spaces.Box(low=np.array([30, 30, 0.1, 0]), high=np.array([40, 70, 0.99, 1]), dtype=np.float32)
+
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        self.observation_space = gym.spaces.Box(
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 2, 2, 2]),
+            dtype=np.float32, 
+        )
+
+    def reset(self):
+
+        # Random seed:
+        super().reset(seed=seed)
+
+        # Variáveis do concept:
+        Tinf = self.Tinf
+        custo_eletrico_kwh = self.custo_eletrico_kwh
+        self.Tinf = Tinf
+        self.custo_eletrico_kwh = custo_eletrico_kwh
+
+        # Tempo inicial:
+        self.tempo_inicial = 0
+
+        # Nível do tanque de aquecimento e setpoint:
+        self.h = 80
+        self.SPh = 80
+
+        # Temperatura de saída:
+        self.Ts = self.Tinf
+
+        # Temperatura do boiler:
+        self.Tq = 55
+
+        # Temperatura do tanque:
+        self.Tt = self.Tinf
+
+        # Vazão de saída:
+        self.Fs = 0
+
+        # Abertura da válvula quente:
+        self.xq = 0
+
+        # Abertura da válvula fria:
+        self.xf = 0
+
+        # Índice de qualidade do banho:
+        self.iqb = 0
+
+        # Custo elétrico do banho:
+        self.custo_eletrico = 0
+
+        # Custo do gás do banho:
+        self.custo_gas = 0
+
+        # Custo da água do banho:
+        self.custo_agua = 0
+
+        # Condições iniciais - Tq, h, Tt, Ts:
+        self.Y0 = np.array([self.Tq, self.h] + 50 * [self.Tinf])
+
+        # Define o buffer para os ganhos integral e derivativo das malhas de controle:
+        # 0 - malha boiler, 1 - malha nível, 2 - malha tanque, 3 - malha saída
+        id = [0, 1, 2, -1]
+        self.Kp = np.array([1, 0.3, 2.0, 0.51])
+        self.b = np.array([1, 1, 1, 0.8])
+        self.I_buffer = self.Kp * self.Y0[id] * (1 - self.b)
+        self.D_buffer = np.array([0, 0, 0, 0])  
+
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb,
+                             self.custo_eletrico, self.custo_gas, self.custo_agua],
+                             dtype=np.float32)
+        
+        return self.obs
+
+    def step(self, action):
+
+        # Tempo de cada iteração:
+        self.tempo_final = self.tempo_inicial + self.tempo_iteracao
+
+        # Seleciona a ação:
+        if self.selector == True:
+            actions = self.model[action].compute_single_action(self.obs)[0]
+            print(actions)
+
+            # Setpoint da temperatura de saída:
+            self.SPTs = round(actions[0][0], 1)
+            # self.SPTs = round(actions[0], 1)
+
+            # Setpoint da temperatura do boiler:
+            self.SPTq = round(actions[1][0], 1)
+            # self.SPTq = round(actions[1], 1)
+
+            # Abertura da válvula de saída:
+            self.xs = round(actions[2][0], 2)
+            # self.xs = round(actions[2], 2)
+
+            # Split-range:
+            self.split_range = actions[3]
+            # self.split_range = round(actions[3])
+
+        else:
+            # Setpoint da temperatura de saída:
+            self.SPTs = round(action[0][0], 1)
+            # self.SPTs = round(action[0], 1)
+
+            # Setpoint da temperatura do boiler:
+            self.SPTq = round(action[1][0], 1)
+            # self.SPTq = round(action[1], 1)
+
+            # Abertura da válvula de saída:
+            self.xs = round(action[2][0], 2)
+            # self.xs = round(action[2], 2)
+
+            # Split-range:
+            self.split_range = action[3]
+            # self.split_range = round(action[3])
+
+        # Variáveis para simulação - tempo, SPTq, SPh, xq, xs, Tf, Td, Tinf, Fd, Sr:
+        self.UT = np.array(
+            [   
+                [self.tempo_inicial, self.SPTq, self.SPh, self.SPTs, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr],
+                [self.tempo_final, self.SPTq, self.SPh, self.SPTs, self.xs, self.Tf, self.Td, self.Tinf, self.Fd, self.Sr]
+            ]
+        )
+
+        # Solução do sistema:
+        self.TT, self.YY, self.UU, self.Y0, self.I_buffer, self.D_buffer = simulacao_malha_temperatura(
+            modelagem_sistema, 
+            self.Y0, 
+            self.UT, 
+            self.dt, 
+            self.I_buffer,
+            self.D_buffer,
+            self.Tinf,
+            self.split_range
+        )
+
+        # Valor final da temperatura do boiler:
+        self.Tq = self.YY[:,0][-1]
+
+        # Valor final do nível do tanque:
+        self.h = self.YY[:,1][-1]
+
+        # Valor final da temperatura do tanque:
+        self.Tt = self.YY[:,2][-1]
+
+        # Valor final da temperatura de saída:
+        self.Ts = self.YY[:,3][-1]
+
+        # Fração do aquecedor do boiler utilizada durante a iteração:
+        self.Sa_total =  self.UU[:,0]
+
+        # Fração da resistência elétrica utilizada durante a iteração:
+        self.Sr_total = self.UU[:,8]
+
+        # Valor final da abertura de corrente fria:
+        self.xf = self.UU[:,1][-1]
+
+        # Valor final da abertura de corrente quente:
+        self.xq = self.UU[:,2][-1]
+
+        # Valor final da abertura da válvula de saída:
+        self.xs = self.UU[:,3][-1]
+
+        # Valor final da vazão de saída:
+        self.Fs = modelo_valvula_saida(self.xs)
+
+        # Cálculo do índice de qualidade do banho:
+        self.iqb = calculo_iqb(self.Ts, self.Fs)
+
+        # Cálculo do custo elétrico do banho:
+        self.custo_eletrico = custo_eletrico_banho(self.Sr_total, self.potencia_eletrica, self.custo_eletrico_kwh, self.dt)
+
+        # Cálculo do custo de gás do banho:
+        self.custo_gas = custo_gas_banho(self.Sa_total, self.potencia_aquecedor, self.custo_gas_kg, self.dt)
+
+        # Cálculo do custo da água:
+        self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
+
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb,
+                             self.custo_eletrico, self.custo_gas, self.custo_agua],
+                             dtype=np.float32)
+
+        # Define a recompensa:
+        reward = 5 * self.iqb - self.custo_eletrico - self.custo_agua - self.custo_gas
+        
+        # Incrementa tempo inicial:
+        self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
+
+        # Termina o episódio se o tempo for maior que 14 ou se o nível do tanque ultrapassar 100:
+        done = False
+        if self.tempo_final == 14 or self.h > 100: 
+            done = True
+
+        info = {}
+
+        return self.obs, reward, done, info
+    
+    def render(self):
+        pass
+
+
+def train_shower_model(concept, selector=False, model=None):
+
+    path_root_models = "/models/"
+    path_root = os.getcwd() + path_root_models
+    path = path_root + "shower_model_" + concept
+    print(path)
+
+    # Seleciona as configurações do ambiente conforme o concept:
+    if concept == "banho_dia_Tinf25":
+        Tinf=25
+        custo_eletrico_kwh = 1
+    if concept == "banho_noite_Tinf25":
+        Tinf=25
+        custo_eletrico_kwh = 2
+    if concept == "seleciona_banho":
+        Tinf=25
+        custo_eletrico_kwh = random.choice([1, 2])
+
+    # Define as configurações para o algoritmo PPO e constrói o agente:
+    agent = ppo.PPOTrainer(env=ShowerEnv, config={"env_config": {"Tinf": Tinf, "custo_eletrico_kwh": custo_eletrico_kwh, "selector": selector, "model": model}})
+
+    # Armazena resultados:
+    results = []
+    episode_data = []
+
+    # Realiza o treinamento:
+    n_iter = 2
+    for n in range(1, n_iter):
+
+        # Treina o agente:
+        result = agent.train()
+        results.append(result)
+        
+        # Armazena dados do episódio:
+        episode = {
+            "n": n,
+            "episode_reward_min": result["episode_reward_min"],
+            "episode_reward_mean": result["episode_reward_mean"], 
+            "episode_reward_max": result["episode_reward_max"],  
+            "episode_len_mean": result["episode_len_mean"],
+        }
+        episode_data.append(episode)
+
+        # Salva checkpoint a cada 5 iterações:
+        if n % 1 == 0:
+            file_name = agent.save(path)
+            print(f'{n:3d}: Min/Mean/Max reward: {result["episode_reward_min"]:8.4f}/{result["episode_reward_mean"]:8.4f}/{result["episode_reward_max"]:8.4f}. Checkpoint saved to {file_name}.')
+        else:
+            print(f'{n:3d}: Min/Mean/Max reward: {result["episode_reward_min"]:8.4f}/{result["episode_reward_mean"]:8.4f}/{result["episode_reward_max"]:8.4f}.')
+  
+    df = pd.DataFrame(data=episode_data)
+    df.to_csv("episode_data_multiagent_ppo_v0_concept_" + concept + ".csv")
+
+    return path
+
+
+# Inicializa o Ray:
+ray.shutdown()
+ray.init()
+
+# Treina cada concept:
+banho_dia_Tinf25 = train_shower_model("banho_dia_Tinf25")
+banho_noite_Tinf25 = train_shower_model("banho_noite_Tinf25")
+
+# Treina o seletor:
+selector = train_shower_model("seleciona_banho", True, [banho_dia_Tinf25, banho_noite_Tinf25])
+
+# Reseta o Ray:
+ray.shutdown()

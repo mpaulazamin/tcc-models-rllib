@@ -54,14 +54,16 @@ class ShowerEnv(gym.Env):
         self.Sr = 0
 
         # Ações - SPTs, SPTq, xs, Sr:
-        self.action_space = gym.spaces.Tuple(
-            (
-                gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
-                gym.spaces.Box(low=0.1, high=0.99, shape=(1,), dtype=np.float32),
-                gym.spaces.Discrete(2, start=0),
-            ),
-        )
+        # self.action_space = gym.spaces.Tuple(
+        #     (
+        #         gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
+        #         gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
+        #         gym.spaces.Box(low=0.1, high=0.99, shape=(1,), dtype=np.float32),
+        #         gym.spaces.Discrete(2, start=0),
+        #     ),
+        # )
+        self.action_space = gym.spaces.Box(low=np.array([30, 30, 0.1, 0]), high=np.array([40, 70, 0.99, 1]), dtype=np.float32)
+
 
         # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb:
         self.observation_space = gym.spaces.Box(
@@ -135,16 +137,20 @@ class ShowerEnv(gym.Env):
         self.tempo_final = self.tempo_inicial + self.tempo_iteracao
 
         # Setpoint da temperatura de saída:
-        self.SPTs = round(action[0][0], 1)
+        # self.SPTs = round(action[0][0], 1)
+        self.SPTs = round(action[0], 1)
 
         # Setpoint da temperatura do boiler:
-        self.SPTq = round(action[1][0], 1)
+        # self.SPTq = round(action[1][0], 1)
+        self.SPTq = round(action[1], 1)
 
         # Abertura da válvula de saída:
-        self.xs = round(action[2][0], 2)
+        # self.xs = round(action[2][0], 2)
+        self.xs = round(action[2], 2)
 
         # Split-range:
-        self.split_range = action[3]
+        # self.split_range = action[3]
+        self.split_range = round(action[3])
 
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs, Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
@@ -277,7 +283,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v11_Tinf25\\checkpoint_000100"
+checkpoint_root = "C:\\Users\\maria\\OneDrive\\TCC\\RLLib_códigos\\tcc-models-rllib\\tcc-models-rllib\\models\\shower_model_banho_noite_Tinf25\\checkpoint_000001"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
