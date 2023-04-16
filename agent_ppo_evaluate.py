@@ -7,6 +7,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import seaborn as sns
+import glob
 from itertools import accumulate
 
 from controle_temperatura_saida import simulacao_malha_temperatura
@@ -25,7 +26,13 @@ np.random.seed(seed)
 class ShowerEnv(gym.Env):
     """Ambiente para simulação do modelo de chuveiro."""
 
-    def __init__(self, config=None):
+    def __init__(self, env_config):
+
+        # Define variáveis conforme o concept:
+        self.Tinf = env_config["Tinf"]
+        self.custo_eletrico_kwh = env_config["custo_eletrico_kwh"]
+        self.selector = env_config["selector"]
+        self.model = env_config["model"]
 
         # Tempo de simulação:
         self.dt = 0.01
@@ -37,7 +44,7 @@ class ShowerEnv(gym.Env):
         self.Fd = 0
         self.Td = 25
         self.Tf = 25
-        self.Tinf = 25
+        # self.Tinf = 25
 
         # Potência da resistência elétrica em kW:
         self.potencia_eletrica = 5.5
@@ -46,29 +53,39 @@ class ShowerEnv(gym.Env):
         self.potencia_aquecedor = 29000
 
         # Custo da energia elétrica em kWh, do kg do gás, e do m3 da água:
-        self.custo_eletrico_kwh = 2
+        # self.custo_eletrico_kwh = 2
         self.custo_gas_kg = 3
         self.custo_agua_m3 = 4
 
         # Fração da resistência elétrica:
         self.Sr = 0
 
-        # Ações - SPTs, SPTq, xs, Sr:
-        # self.action_space = gym.spaces.Tuple(
-        #     (
-        #         gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
-        #         gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
-        #         gym.spaces.Box(low=0.1, high=0.99, shape=(1,), dtype=np.float32),
-        #         gym.spaces.Discrete(2, start=0),
-        #     ),
-        # )
-        self.action_space = gym.spaces.Box(low=np.array([30, 30, 0.1, 0]), high=np.array([40, 70, 0.99, 1]), dtype=np.float32)
+        # Adiciona o número de concepts caso seja o selector:
+        if self.selector == True:
+            self.action_space = gym.spaces.Discrete(2)
+            self.models = []
 
+            for i in self.model:
+                self.models.append(Policy.from_checkpoint(glob.glob(i+"/*")[-1])['default_policy'])
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb:
+            self.model = self.models
+            print(self.model)
+
+        else:
+            # Ações - SPTs, SPTq, xs, Sr:
+            self.action_space = gym.spaces.Tuple(
+                (
+                    gym.spaces.Box(low=30, high=40, shape=(1,), dtype=np.float32),
+                    gym.spaces.Box(low=30, high=70, shape=(1,), dtype=np.float32),
+                    gym.spaces.Box(low=0.1, high=0.99, shape=(1,), dtype=np.float32),
+                    gym.spaces.Discrete(2, start=0),
+                ),
+            )
+
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
         self.observation_space = gym.spaces.Box(
-            low=np.array([0, 0, 0, 0, 0, 0, 0, 0]),
-            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1]),
+            low=np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]),
+            high=np.array([100, 100, 100, 10000, 100, 1, 1, 1, 2, 2, 2]),
             dtype=np.float32, 
         )
 
@@ -76,6 +93,12 @@ class ShowerEnv(gym.Env):
 
         # Random seed:
         super().reset(seed=seed)
+
+        # Variáveis do concept:
+        Tinf = self.Tinf
+        custo_eletrico_kwh = self.custo_eletrico_kwh
+        self.Tinf = Tinf
+        self.custo_eletrico_kwh = custo_eletrico_kwh
 
         # Tempo inicial:
         self.tempo_inicial = 0
@@ -125,8 +148,9 @@ class ShowerEnv(gym.Env):
         self.I_buffer = self.Kp * self.Y0[id] * (1 - self.b)
         self.D_buffer = np.array([0, 0, 0, 0])  
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb],
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb,
+                             self.custo_eletrico, self.custo_gas, self.custo_agua],
                              dtype=np.float32)
         
         return self.obs
@@ -136,21 +160,35 @@ class ShowerEnv(gym.Env):
         # Tempo de cada iteração:
         self.tempo_final = self.tempo_inicial + self.tempo_iteracao
 
-        # Setpoint da temperatura de saída:
-        # self.SPTs = round(action[0][0], 1)
-        self.SPTs = round(action[0], 1)
+        # Seleciona a ação:
+        if self.selector == True:
+            actions = self.model[action].compute_single_action(self.obs, explore=False)[0]
+            print(actions)
 
-        # Setpoint da temperatura do boiler:
-        # self.SPTq = round(action[1][0], 1)
-        self.SPTq = round(action[1], 1)
+            # Setpoint da temperatura de saída:
+            self.SPTs = round((actions[0][0] * np.std([30, 40])) + np.mean([30,40]), 1)
 
-        # Abertura da válvula de saída:
-        # self.xs = round(action[2][0], 2)
-        self.xs = round(action[2], 2)
+            # Setpoint da temperatura do boiler:
+            self.SPTq = round((actions[1][0] * np.std([30, 70])) + np.mean([30, 70]), 1)
 
-        # Split-range:
-        # self.split_range = action[3]
-        self.split_range = round(action[3])
+            # Abertura da válvula de saída:
+            self.xs = round((actions[2][0] * np.std([0.1, 0.99])) + np.mean([0.1, 0.99]), 2)
+
+            # Split-range:
+            self.split_range = actions[3]
+
+        else:
+            # Setpoint da temperatura de saída:
+            self.SPTs = round(action[0][0], 1)
+
+            # Setpoint da temperatura do boiler:
+            self.SPTq = round(actions[1][0], 1)
+
+            # Abertura da válvula de saída:
+            self.xs = round(actions[2][0], 2)
+
+            # Split-range:
+            self.split_range = actions[3]
 
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs, Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
@@ -214,12 +252,13 @@ class ShowerEnv(gym.Env):
         # Cálculo do custo da água:
         self.custo_agua = custo_agua_banho(self.Fs, self.custo_agua_m3, self.tempo_iteracao)
 
-        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb:
-        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb],
+        # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
+        self.obs = np.array([self.Ts, self.Tq, self.Tt, self.h, self.Fs, self.xq, self.xf, self.iqb,
+                             self.custo_eletrico, self.custo_gas, self.custo_agua],
                              dtype=np.float32)
 
         # Define a recompensa:
-        reward = self.iqb
+        reward = 5 * self.iqb - self.custo_eletrico - self.custo_agua - self.custo_gas
         
         # Incrementa tempo inicial:
         self.tempo_inicial = self.tempo_inicial + self.tempo_iteracao
@@ -279,17 +318,34 @@ class ShowerEnv(gym.Env):
 ray.shutdown()
 info = ray.init(ignore_reinit_error=True)
 
-# Carrega o agente salvo:
-config = ppo.PPOConfig()
-config.environment(env=ShowerEnv)
-agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\OneDrive\\TCC\\RLLib_códigos\\tcc-models-rllib\\tcc-models-rllib\\models\\shower_model_banho_noite_Tinf25\\checkpoint_000001"
-agent.restore(checkpoint_root)
+# Define os modelos:
+banho_dia_Tinf25 = ".\models\shower_model_banho_dia_Tinf25"
+banho_noite_Tinf25 = ".\models\shower_model_banho_noite_Tinf25"
+selector_path = ".\models\shower_model_seleciona_banho"
+
+# Define o concept e o seletor:
+concept = "banho_noite_Tinf25"
+selector = True
+model = [banho_dia_Tinf25, banho_noite_Tinf25]
+
+# Seleciona as configurações do ambiente conforme o concept:
+if concept == "banho_dia_Tinf25":
+    Tinf=25
+    custo_eletrico_kwh = 1
+if concept == "banho_noite_Tinf25":
+    Tinf=25
+    custo_eletrico_kwh = 2
+if concept == "seleciona_banho":
+    Tinf=25
+    custo_eletrico_kwh = random.choice([1, 2])
 
 # Constrói o ambiente:
-env = ShowerEnv()
+bench_env = ShowerEnv({"Tinf": Tinf, "custo_eletrico_kwh": custo_eletrico_kwh, "selector": selector, "model": model})
+obs = bench_env.reset()
 done = False
-obs = env.reset()
+
+# Carrega o seletor:
+model = Algorithm.from_checkpoint(glob.glob(selector_path +"/*")[-1])
 
 # Para visualização:
 SPTq_list = []
@@ -326,12 +382,12 @@ for i in range(0, 1):
     for i in range(0, 7):
 
         # Seleciona ações:
-        action = agent.compute_single_action(obs)
+        action = model.compute_single_action(obs)
         print(f"Iteração: {i}")
         print(f"Ações: {action}")
 
         # Retorna os estados e a recompensa:
-        obs, reward, done, info = env.step(action)
+        obs, reward, done, info = bench_env.step(action)
         print(f"Estados: {obs}")
 
         # Recompensa total:
@@ -395,110 +451,85 @@ custo_agua_list_acumulado = list(accumulate(custo_agua_list))
 sns.set_style("darkgrid")
 fig, ax = plt.subplots(1, 1, figsize=(5, 4))
 
-ax.plot(time_total, SPTs, label="Ação - Setpoint da temperatura de saída", color="navy", linestyle="dashed")
-ax.plot(time_total, Ts, label="Temperatura de saída", color="royalblue", linestyle="solid")
-ax.plot(time_total, Tt, label="Temperatura do tanque", color="deepskyblue", linestyle="solid")
-ax.set_title("Temperaturas de saída e do tanque para configuração B")
-ax.set_xlabel("Tempo em minutos")
-ax.set_ylabel("Temperatura em °C")
-ax.legend()
+sns.set_style("darkgrid")
+fig, ax = plt.subplots(2, 2, figsize=(20, 17))
+
+ax[0, 0].plot(time_total, SPTs, label="Ação - setpoint da temperatura de saída (SPTs)", color="navy", linestyle="dashed")
+ax[0, 0].plot(time_total, Ts, label="Temperatura de saída (Ts)", color="royalblue", linestyle="solid")
+ax[0, 0].plot(time_total, Tt, label="Temperatura do tanque (Tt)", color="deepskyblue", linestyle="solid")
+ax[0, 0].set_title("Temperaturas de saída (Ts) e do tanque (Tt)")
+ax[0, 0].set_xlabel("Tempo em minutos")
+ax[0, 0].set_ylabel("Temperatura em °C")
+ax[0, 0].legend()
+
+ax[0, 1].plot(time_total, SPTq, label="Ação - setpoint da temperatura do boiler (SPTq)", color="purple", linestyle="dashed")
+ax[0, 1].plot(time_total, Tq, label="Temperatura do boiler (Tq)", color="mediumorchid", linestyle="solid")
+ax[0, 1].set_title("Temperatura do boiler (Tq)")
+ax[0, 1].set_xlabel("Tempo em minutos")
+ax[0, 1].set_ylabel("Temperatura °C")
+ax[0, 1].legend()
+
+ax[1, 0].plot(time_total, xq, label="Abertura da válvula quente (xq)", color="darkmagenta", linestyle="solid")
+ax[1, 0].plot(time_total, xf, label="Abertura da válvula fria (xf)", color="deeppink", linestyle="solid")
+ax[1, 0].plot(time_total, xs, label="Ação - abertura da válvula de saída (xs)", color="palevioletred", linestyle="solid")
+ax[1, 0].set_title("Aberturas das válvulas quente (xq), fria (xf) e de saída (xs)")
+ax[1, 0].set_xlabel("Tempo em minutos")
+ax[1, 0].set_ylabel("Abertura")
+ax[1, 0].legend()
+
+ax[1, 1].plot(time_total, Sa, label="Fração de aquecimento do boiler (Sa)", color="skyblue", linestyle="solid")
+ax[1, 1].plot(time_total, Sr, label="Ação - fração da resistência elétrica (Sr)", color="darkcyan", linestyle="solid")
+ax[1, 1].set_title("Frações da resistência elétrica (Sr) e do aquecimento do boiler (Sa)")
+ax[1, 1].set_xlabel("Tempo em minutos")
+ax[1, 1].set_ylabel("Fração")
+ax[1, 1].legend()
 plt.show()
 
-fig, ax = plt.subplots(1, 1, figsize=(5, 4))
-ax.plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
-ax.set_title("IQB para configuração B")
-ax.set_xlabel("Ação")
-ax.set_ylabel("Índice")
-ax.legend()
+fig, ax = plt.subplots(1, 2, figsize=(15, 5))
+ax[0].plot(time_total, SPh, label="Setpoint do nível do tanque (SPh)", color="darkslategray", linestyle="dashed")
+ax[0].plot(time_total, h, label="Nível do tanque (h)", color="teal", linestyle="solid")
+ax[0].set_title("Nível do tanque (h)")
+ax[0].set_xlabel("Tempo em minutos")
+ax[0].set_ylabel("Nível")
+ax[0].legend()
+
+ax[1].plot(time_total, Fs, label="Vazão de saída (Fs)", color="slateblue", linestyle="solid")
+ax[1].plot(time_total, Fd, label="Vazão da corrente de distúrbio (Fd)", color="darkorchid", linestyle="solid")
+ax[1].set_title("Vazões de saída (Fs) e de distúrbio (Fd)")
+ax[1].set_xlabel("Tempo em minutos")
+ax[1].set_ylabel("Vazão em litros/minutos")
+ax[1].legend()
 plt.show()
 
-fig, ax = plt.subplots(1, 1, figsize=(5, 4))
-ax.plot(time_total, Fs, label="Vazão de saída", color="firebrick", linestyle="solid")
-ax.set_title("Vazão de saída para configuração B")
-ax.set_xlabel("Tempo em minutos")
-ax.set_ylabel("Vazão em litros/minutos")
-ax.legend()
-plt.show()
+fig, ax = plt.subplots(1, 3, figsize=(20, 5))
+ax[0].plot(time_actions, iqb_list, label="IQB", color="crimson", linestyle="solid")
+ax[0].set_title("Índice de qualidade do banho (IQB)")
+ax[0].set_xlabel("Ação")
+ax[0].set_ylabel("Índice")
+ax[0].legend()
 
-# sns.set_style("darkgrid")
-# fig, ax = plt.subplots(2, 2, figsize=(20, 17))
-
-# ax[0, 0].plot(time_total, SPTs, label="Ação - setpoint da temperatura de saída (SPTs)", color="navy", linestyle="dashed")
-# ax[0, 0].plot(time_total, Ts, label="Temperatura de saída (Ts)", color="royalblue", linestyle="solid")
-# ax[0, 0].plot(time_total, Tt, label="Temperatura do tanque (Tt)", color="deepskyblue", linestyle="solid")
-# ax[0, 0].set_title("Temperaturas de saída (Ts) e do tanque (Tt)")
-# ax[0, 0].set_xlabel("Tempo em minutos")
-# ax[0, 0].set_ylabel("Temperatura em °C")
-# ax[0, 0].legend()
-
-# ax[0, 1].plot(time_total, SPTq, label="Ação - setpoint da temperatura do boiler (SPTq)", color="purple", linestyle="dashed")
-# ax[0, 1].plot(time_total, Tq, label="Temperatura do boiler (Tq)", color="mediumorchid", linestyle="solid")
-# ax[0, 1].set_title("Temperatura do boiler (Tq)")
-# ax[0, 1].set_xlabel("Tempo em minutos")
-# ax[0, 1].set_ylabel("Temperatura °C")
-# ax[0, 1].legend()
-
-# ax[1, 0].plot(time_total, xq, label="Abertura da válvula quente (xq)", color="darkmagenta", linestyle="solid")
-# ax[1, 0].plot(time_total, xf, label="Abertura da válvula fria (xf)", color="deeppink", linestyle="solid")
-# ax[1, 0].plot(time_total, xs, label="Ação - abertura da válvula de saída (xs)", color="palevioletred", linestyle="solid")
-# ax[1, 0].set_title("Aberturas das válvulas quente (xq), fria (xf) e de saída (xs)")
-# ax[1, 0].set_xlabel("Tempo em minutos")
-# ax[1, 0].set_ylabel("Abertura")
-# ax[1, 0].legend()
-
-# ax[1, 1].plot(time_total, Sa, label="Fração de aquecimento do boiler (Sa)", color="skyblue", linestyle="solid")
-# ax[1, 1].plot(time_total, Sr, label="Ação - fração da resistência elétrica (Sr)", color="darkcyan", linestyle="solid")
-# ax[1, 1].set_title("Frações da resistência elétrica (Sr) e do aquecimento do boiler (Sa)")
-# ax[1, 1].set_xlabel("Tempo em minutos")
-# ax[1, 1].set_ylabel("Fração")
-# ax[1, 1].legend()
-# plt.show()
-
-# fig, ax = plt.subplots(1, 2, figsize=(15, 5))
-# ax[0].plot(time_total, SPh, label="Setpoint do nível do tanque (SPh)", color="darkslategray", linestyle="dashed")
-# ax[0].plot(time_total, h, label="Nível do tanque (h)", color="teal", linestyle="solid")
-# ax[0].set_title("Nível do tanque (h)")
-# ax[0].set_xlabel("Tempo em minutos")
-# ax[0].set_ylabel("Nível")
-# ax[0].legend()
-
-# ax[1].plot(time_total, Fs, label="Vazão de saída (Fs)", color="slateblue", linestyle="solid")
-# ax[1].plot(time_total, Fd, label="Vazão da corrente de distúrbio (Fd)", color="darkorchid", linestyle="solid")
-# ax[1].set_title("Vazões de saída (Fs) e de distúrbio (Fd)")
-# ax[1].set_xlabel("Tempo em minutos")
-# ax[1].set_ylabel("Vazão em litros/minutos")
-# ax[1].legend()
-# plt.show()
-
-# fig, ax = plt.subplots(1, 3, figsize=(20, 5))
-# ax[0].plot(time_actions, iqb_list, label="IQB", color="crimson", linestyle="solid")
-# ax[0].set_title("Índice de qualidade do banho (IQB)")
-# ax[0].set_xlabel("Ação")
-# ax[0].set_ylabel("Índice")
-# ax[0].legend()
-
-# # ax[1].plot(time_actions, recompensa_list, label="Recompensa", color="violet", linestyle="solid")
-# # ax[1].set_title("Recompensa em cada iteração")
-# # ax[1].set_xlabel("Ação")
-# # ax[1].set_ylabel("Índice")
-# # ax[1].legend()
-
-# ax[1].plot(time_actions, custo_eletrico_list, label="Custo elétrico", color="black", linestyle="solid")
-# ax[1].plot(time_actions, custo_gas_list, label="Custo do gás", color="gray", linestyle="solid")
-# ax[1].plot(time_actions, custo_agua_list, label="Custo da água", color="dodgerblue", linestyle="solid")
-# ax[1].set_title("Custos do banho em cada ação")
+# ax[1].plot(time_actions, recompensa_list, label="Recompensa", color="violet", linestyle="solid")
+# ax[1].set_title("Recompensa em cada iteração")
 # ax[1].set_xlabel("Ação")
-# ax[1].set_ylabel("Custos em reais")
+# ax[1].set_ylabel("Índice")
 # ax[1].legend()
 
-# ax[2].plot(time_actions, custo_eletrico_list_acumulado, label="Custo elétrico", color="black", linestyle="solid")
-# ax[2].plot(time_actions, custo_gas_list_acumulado, label="Custo do gás", color="gray", linestyle="solid")
-# ax[2].plot(time_actions, custo_agua_list_acumulado, label="Custo da água", color="dodgerblue", linestyle="solid")
-# ax[2].set_title("Custos cumulativos do banho")
-# ax[2].set_xlabel("Ação")
-# ax[2].set_ylabel("Custos em reais")
-# ax[2].legend()
-# plt.show()
+ax[1].plot(time_actions, custo_eletrico_list, label="Custo elétrico", color="black", linestyle="solid")
+ax[1].plot(time_actions, custo_gas_list, label="Custo do gás", color="gray", linestyle="solid")
+ax[1].plot(time_actions, custo_agua_list, label="Custo da água", color="dodgerblue", linestyle="solid")
+ax[1].set_title("Custos do banho em cada ação")
+ax[1].set_xlabel("Ação")
+ax[1].set_ylabel("Custos em reais")
+ax[1].legend()
+
+ax[2].plot(time_actions, custo_eletrico_list_acumulado, label="Custo elétrico", color="black", linestyle="solid")
+ax[2].plot(time_actions, custo_gas_list_acumulado, label="Custo do gás", color="gray", linestyle="solid")
+ax[2].plot(time_actions, custo_agua_list_acumulado, label="Custo da água", color="dodgerblue", linestyle="solid")
+ax[2].set_title("Custos cumulativos do banho")
+ax[2].set_xlabel("Ação")
+ax[2].set_ylabel("Custos em reais")
+ax[2].legend()
+plt.show()
 
 # Gráficos:
 sns.set_style("darkgrid")

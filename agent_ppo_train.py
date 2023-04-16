@@ -87,7 +87,6 @@ class ShowerEnv(gym.Env):
                     gym.spaces.Discrete(2, start=0),
                 ),
             )
-            # self.action_space = gym.spaces.Box(low=np.array([30, 30, 0.1, 0]), high=np.array([40, 70, 0.99, 1]), dtype=np.float32)
 
         # Estados - Ts, Tq, Tt, h, Fs, xq, xf, iqb, custo_eletrico, custo_gas, custo_agua:
         self.observation_space = gym.spaces.Box(
@@ -169,41 +168,33 @@ class ShowerEnv(gym.Env):
 
         # Seleciona a ação:
         if self.selector == True:
-            actions = self.model[action].compute_single_action(self.obs)[0]
+            actions = self.model[action].compute_single_action(self.obs, explore=False)[0]
             print(actions)
 
             # Setpoint da temperatura de saída:
-            self.SPTs = round(actions[0][0], 1)
-            # self.SPTs = round(actions[0], 1)
+            self.SPTs = round((actions[0][0] * np.std([30, 40])) + np.mean([30,40]), 1)
 
             # Setpoint da temperatura do boiler:
-            self.SPTq = round(actions[1][0], 1)
-            # self.SPTq = round(actions[1], 1)
+            self.SPTq = round((actions[1][0] * np.std([30, 70])) + np.mean([30, 70]), 1)
 
             # Abertura da válvula de saída:
-            self.xs = round(actions[2][0], 2)
-            # self.xs = round(actions[2], 2)
+            self.xs = round((actions[2][0] * np.std([0.1, 0.99])) + np.mean([0.1, 0.99]), 2)
 
             # Split-range:
             self.split_range = actions[3]
-            # self.split_range = round(actions[3])
 
         else:
             # Setpoint da temperatura de saída:
             self.SPTs = round(action[0][0], 1)
-            # self.SPTs = round(action[0], 1)
 
             # Setpoint da temperatura do boiler:
-            self.SPTq = round(action[1][0], 1)
-            # self.SPTq = round(action[1], 1)
+            self.SPTq = round(actions[1][0], 1)
 
             # Abertura da válvula de saída:
-            self.xs = round(action[2][0], 2)
-            # self.xs = round(action[2], 2)
+            self.xs = round(actions[2][0], 2)
 
             # Split-range:
-            self.split_range = action[3]
-            # self.split_range = round(action[3])
+            self.split_range = actions[3]
 
         # Variáveis para simulação - tempo, SPTq, SPh, xq, xs, Tf, Td, Tinf, Fd, Sr:
         self.UT = np.array(
@@ -300,13 +291,13 @@ def train_shower_model(concept, selector=False, model=None):
 
     # Seleciona as configurações do ambiente conforme o concept:
     if concept == "banho_dia_Tinf25":
-        Tinf=25
+        Tinf = 25
         custo_eletrico_kwh = 1
     if concept == "banho_noite_Tinf25":
-        Tinf=25
+        Tinf = 25
         custo_eletrico_kwh = 2
     if concept == "seleciona_banho":
-        Tinf=25
+        Tinf = 25
         custo_eletrico_kwh = random.choice([1, 2])
 
     # Define as configurações para o algoritmo PPO e constrói o agente:
