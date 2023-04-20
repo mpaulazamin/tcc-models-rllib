@@ -56,7 +56,7 @@ Isso foi feito para comparar com os resultados do agent_ppo_v9, onde os custos f
 
 ### Resultados
 
-A figuras abaixos mostram o sistema com o agente treinado com 50 steps para diferentes temperaturas ambientes.
+A figuras abaixo mostram o sistema com o agente treinado com 100 steps para diferentes temperaturas ambientes.
 
 ![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v10/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v10_Tinf25.png)
 
