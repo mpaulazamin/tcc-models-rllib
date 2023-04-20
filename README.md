@@ -1,4 +1,4 @@
-## Agent PPO - V11
+## Agent PPO - V12
 
 Modelo com malha de inventário para o nível do tanque, com controle liga-desliga do boiler, com malha cascata e com split-range.
 
@@ -21,6 +21,9 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 - xq: 0 a 1
 - xf: 0 a 1
 - iqb: 0 a 1
+- custo_eletrico: 0 a 1
+- custo_gas: 0 a 1
+- custo_agua: 0 a 1 
 
 ### Variáveis fixas
 
@@ -49,7 +52,7 @@ Modelo com malha de inventário para o nível do tanque, com controle liga-desli
 Definida como:
 
 ```bash
-reward = iqb
+reward = 5 * iqb - 2 * custo_eletrico - custo_gas - custo_agua
 ```
 
 ### Resultados
