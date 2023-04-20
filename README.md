@@ -52,10 +52,10 @@ Definida como:
 reward = iqb
 ```
 
-Isso foi feito para comparar com os resultados do agent_ppo_v9, onde os custos foram incluídos na recompensa.
-
 ### Resultados
 
-TBD
+A figura abaixo mostraa o sistema com o agente treinado com 100 steps.
+
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v11/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v11_Tinf25.jpg)
 
 ### Próximos passos
