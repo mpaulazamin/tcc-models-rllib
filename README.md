@@ -79,10 +79,13 @@ reward = 5 * iqb - 2 * custo_eletrico - custo_gas - custo_agua
 
 O agente consegue controlar bem o sistema, chegando a IQBs próximos a 1, e com o custo da energia elétrica bem reduzido (comparável aos custos quando utiliza-se split-range).
 
-A figura abaixo mostra o sistema com o agente treinado com 50 steps.
+A figuras abaixos mostram o sistema com o agente treinado com 50 steps para diferentes temperaturas ambientes.
 
-![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v9.png)
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v9_Tinf25.png)
 
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v9_Tinf20.png)
+
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v9/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v9_Tinf15.png)
 ### Próximos passos
 
 - Aumentar o número de iterações para melhor convergência.
