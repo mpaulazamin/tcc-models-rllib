@@ -290,15 +290,23 @@ def train_shower_model(concept, selector=False, model=None):
     print(path)
 
     # Seleciona as configurações do ambiente conforme o concept:
+    # Temperaturas de 15 a 30:
     if concept == "banho_dia_Tinf25":
-        Tinf = 25
-        custo_eletrico_kwh = 1
+        Tinf = [25, 26, 27, 28, 29, 30]
+        custo_eletrico_kwh = [1, 1.5]
     if concept == "banho_noite_Tinf25":
-        Tinf = 25
+        Tinf = [25, 26, 27, 28, 29, 30]
+        custo_eletrico_kwh = [2, 2.5]
+    if concept == "banho_dia_Tinf20":
+        Tinf = [20, 21, 22, 23, 24]
+        custo_eletrico_kwh = 1
+    if concept == "banho_noite_Tinf20":
+        Tinf = [20, 21, 22, 23, 24]
         custo_eletrico_kwh = 2
     if concept == "seleciona_banho":
-        Tinf = 25
+        Tinf = random.choice([20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30])
         custo_eletrico_kwh = random.choice([1, 2])
+
 
     # Define as configurações para o algoritmo PPO e constrói o agente:
     agent = ppo.PPOTrainer(env=ShowerEnv, config={"env_config": {"Tinf": Tinf, "custo_eletrico_kwh": custo_eletrico_kwh, "selector": selector, "model": model}})
