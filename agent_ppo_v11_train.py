@@ -39,9 +39,9 @@ class ShowerEnv(gym.Env):
 
         # Distúrbios e temperatura ambiente - Fd, Td, Tf, Tinf:
         self.Fd = 0
-        self.Td = 25
-        self.Tf = 25
-        self.Tinf = 25
+        self.Td = 15
+        self.Tf = 15
+        self.Tinf = 15
 
         # Potência da resistência elétrica em kW:
         self.potencia_eletrica = 5.5
