@@ -59,7 +59,7 @@ reward = 5 * iqb - 2 * custo_eletrico - custo_gas - custo_agua
 
 A figura abaixo mostraa o sistema com o agente treinado com 50 steps.
 
-![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v11/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v12_Tinf15.jpg)
+![image](https://github.com/mpaulazamin/tcc-models-rllib/blob/agent_ppo_v12/imagens/avalia%C3%A7%C3%A3o_agent_ppo_v12_Tinf15.png)
 
 ### Próximos passos
 
