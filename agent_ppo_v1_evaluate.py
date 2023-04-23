@@ -379,6 +379,7 @@ df["Tt"] = Tt
 df["Ts"] = Ts
 df["Sr"] = Sr
 df["Sa"] = Sa
+df["Fs"] = Fs
 df.to_csv("variables_confA.csv", index=False)
 
 df = pd.DataFrame()
