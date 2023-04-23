@@ -371,6 +371,20 @@ Td = np.concatenate(Td_list, axis=0)
 Tf = np.concatenate(Tf_list, axis=0)
 Tinf = np.concatenate(Tinf_list, axis=0)
 
+import pandas as pd
+df = pd.DataFrame()
+df["SPTq"] = SPTq
+df["Tq"] = Tq
+df["Tt"] = Tt
+df["Ts"] = Ts
+df["Sr"] = Sr
+df["Sa"] = Sa
+df.to_csv("variables_confA.csv", index=False)
+
+df = pd.DataFrame()
+df["IQB"] = iqb_list
+df.to_csv("iqb_confA.csv", index=False)
+
 # Gráficos:
 sns.set_style("darkgrid")
 fig, ax = plt.subplots(1, 1, figsize=(5, 4))
