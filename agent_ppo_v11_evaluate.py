@@ -35,9 +35,9 @@ class ShowerEnv(gym.Env):
 
         # Distúrbios e temperatura ambiente - Fd, Td, Tf, Tinf:
         self.Fd = 0
-        self.Td = 15
-        self.Tf = 15
-        self.Tinf = 15
+        self.Td = 25
+        self.Tf = 25
+        self.Tinf = 25
 
         # Potência da resistência elétrica em kW:
         self.potencia_eletrica = 5.5
@@ -277,7 +277,7 @@ info = ray.init(ignore_reinit_error=True)
 config = ppo.PPOConfig()
 config.environment(env=ShowerEnv)
 agent = config.build()
-checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v11_Tinf15\\checkpoint_000050"
+checkpoint_root = "C:\\Users\\maria\\ray_ppo_checkpoints\\agent_ppo_v11_Tinf25\\checkpoint_000100"
 agent.restore(checkpoint_root)
 
 # Constrói o ambiente:
@@ -378,6 +378,21 @@ Td = np.concatenate(Td_list, axis=0)
 Tf = np.concatenate(Tf_list, axis=0)
 Tinf = np.concatenate(Tinf_list, axis=0)
 
+import pandas as pd
+df = pd.DataFrame()
+df["SPTq"] = SPTq
+df["Tq"] = Tq
+df["Tt"] = Tt
+df["SPTs"] = SPTs
+df["Ts"] = Ts
+df["Sr"] = Sr
+df["Sa"] = Sa
+df.to_csv("variables_confB.csv", index=False)
+
+df = pd.DataFrame()
+df["IQB"] = iqb_list
+df.to_csv("iqb_confB.csv", index=False)
+
 # Custos cumulativos:
 custo_eletrico_list_acumulado = list(accumulate(custo_eletrico_list))
 custo_gas_list_acumulado = list(accumulate(custo_gas_list))
@@ -386,33 +401,33 @@ custo_agua_list_acumulado = list(accumulate(custo_agua_list))
 # print(custo_eletrico_list_acumulado)
 
 # Gráficos:
-# sns.set_style("darkgrid")
-# fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+sns.set_style("darkgrid")
 
-# ax.plot(time_total, SPTs, label="Ação - Setpoint da temperatura de saída", color="navy", linestyle="dashed")
-# ax.plot(time_total, Ts, label="Temperatura de saída", color="royalblue", linestyle="solid")
-# ax.plot(time_total, Tt, label="Temperatura do tanque", color="deepskyblue", linestyle="solid")
-# ax.set_title("Temperaturas de saída e do tanque para configuração B")
-# ax.set_xlabel("Tempo em minutos")
-# ax.set_ylabel("Temperatura em °C")
-# ax.legend()
-# plt.show()
+fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+ax.plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
+ax.set_title("IQB para configuração B")
+ax.set_xlabel("Ação")
+ax.set_ylabel("Índice")
+ax.legend()
+plt.show()
 
-# fig, ax = plt.subplots(1, 1, figsize=(5, 4))
-# ax.plot(time_actions, iqb_list, label="IQB", color="black", linestyle="solid")
-# ax.set_title("IQB para configuração B")
-# ax.set_xlabel("Ação")
-# ax.set_ylabel("Índice")
-# ax.legend()
-# plt.show()
+fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+ax.plot(time_total, SPTs, label="Ação - Setpoint da temperatura de saída", color="navy", linestyle="dashed")
+ax.plot(time_total, Ts, label="Temperatura de saída", color="royalblue", linestyle="solid")
+ax.plot(time_total, Tt, label="Temperatura do tanque", color="deepskyblue", linestyle="solid")
+ax.set_title("Temperaturas de saída e do tanque para configuração B")
+ax.set_xlabel("Tempo em minutos")
+ax.set_ylabel("Temperatura em °C")
+ax.legend()
+plt.show()
 
-# fig, ax = plt.subplots(1, 1, figsize=(5, 4))
-# ax.plot(time_total, Fs, label="Vazão de saída", color="firebrick", linestyle="solid")
-# ax.set_title("Vazão de saída para configuração B")
-# ax.set_xlabel("Tempo em minutos")
-# ax.set_ylabel("Vazão em litros/minutos")
-# ax.legend()
-# plt.show()
+fig, ax = plt.subplots(1, 1, figsize=(5, 4))
+ax.plot(time_total, Fs, label="Vazão de saída", color="firebrick", linestyle="solid")
+ax.set_title("Vazão de saída para configuração B")
+ax.set_xlabel("Tempo em minutos")
+ax.set_ylabel("Vazão em litros/minutos")
+ax.legend()
+plt.show()
 
 # sns.set_style("darkgrid")
 # fig, ax = plt.subplots(2, 2, figsize=(20, 17))
